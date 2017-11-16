@@ -1,0 +1,50 @@
+{
+  "name": "market-maker",
+  "version": "1.0.0",
+  "description": "market maker for LEV via Getcoin",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node index.js",
+    "test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/market-maker/staking.git"
+  },
+  "keywords": [
+    "leverj",
+    "LEV",
+    "trading"
+  ],
+  "author": "benny.sadeh@leverj.io",
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./test/test_helper.js",
+    "testMatch": [
+      "./test/**/*.js?(x)",
+      "**/?(*.)(spec|test).js?(x)"
+    ]
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "chai": "^4.1.2",
+    "chai-immutable": "^1.6.0",
+    "jest": "^21.2.1"
+  },
+  "dependencies": {
+    "immutable": "^3.8.2",
+    "redux": "^3.7.2",
+    "socket.io": "^2.0.4"
+  }
+}
