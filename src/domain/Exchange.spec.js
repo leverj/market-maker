@@ -1,6 +1,5 @@
-import {Side} from "./orders"
-import {Currency} from "./currencies"
-import {Exchange} from "./exchange"
+import {Currency} from "./Currency"
+import {Exchange} from "./Exchange"
 
 
 class StubbedExchange extends Exchange {
@@ -13,7 +12,6 @@ class StubbedExchange extends Exchange {
   set exchangeRate(value) { this._exchangeRate = value }
 
   place(order) { throw new TypeError("Must override method") }
-  update(order) { throw new TypeError("Must override method") }
   cancel(order) { throw new TypeError("Must override method") }
   currentExchangeRateFor(currencies) { throw new TypeError("Must override method") }
 }

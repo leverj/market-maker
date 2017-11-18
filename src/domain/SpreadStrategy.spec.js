@@ -1,29 +1,29 @@
 import {List} from 'immutable'
-import SpreadStrategy from "./SpreadStrategy"
-import {Side} from "./orders"
-import {Asset} from "./assets"
+import {SpreadStrategy} from "./SpreadStrategy"
+import {Way} from "./Order"
+import {Currency} from "./Currency"
 
 
 describe('Spread Strategy', () => {
-  const assets = Asset.pair(Asset.LEV(), Asset.ETH())
+  const currencies = Currency.pair(Currency.LEV(), Currency.ETH())
 
   describe('fixed spread', () => {
-    const depth = 3, quantity = 1, step = 0.1
-    const spread = SpreadStrategy.fixed(depth, quantity, step)
+    const depth = 3, amount = 1, step = 0.1
+    const spread = SpreadStrategy.fixed(depth, amount, step)
 
     describe('generating orders', () => {
-      it('should generate symmetric buy & sell orders', () => {
+      it('should generate symmetric bid & ask orders', () => {
         const price = 10.50
-        const orders = spread.generateOrdersFor(price, assets)
-        const buys = orders.filter(each => each.side == Side.buy)
-        const sells = orders.filter(each => each.side == Side.sell)
+        const orders = spread.generateOrdersFor(price, currencies)
+        const bids = orders.filter(each => each.way == Way.bid)
+        const asks = orders.filter(each => each.way == Way.ask)
 
         expect(orders.size).toBe(spread.depth * 2)
-        expect(buys.size).toBe(spread.depth)
-        expect(sells.size).toBe(spread.depth)
-        expect(buys.map(each => each.price)).toEqual(List.of(10.4, 10.3, 10.2))
-        expect(sells.map(each => each.price)).toEqual(List.of(10.6, 10.7, 10.8))
-        orders.forEach(each => expect(each.quantity).toBe(spread.quantity))
+        expect(bids.size).toBe(spread.depth)
+        expect(asks.size).toBe(spread.depth)
+        expect(bids.map(each => each.price)).toEqual(List.of(10.4, 10.3, 10.2))
+        expect(asks.map(each => each.price)).toEqual(List.of(10.6, 10.7, 10.8))
+        orders.forEach(each => expect(each.amount).toBe(spread.amount))
       })
     })
 

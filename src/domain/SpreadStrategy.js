@@ -1,31 +1,31 @@
 import {List, Range} from 'immutable'
-import {Order} from "./orders"
+import {Order} from "./Order"
 
 
-export default class SpreadStrategy {
-  static fixed(depth, quantity, step) { return new FixedSpread(depth, quantity, step) }
+export class SpreadStrategy {
+  static fixed(depth, amount, step) { return new FixedSpread(depth, amount, step) }
 
   generateOrdersFor(price, assets) { throw new TypeError("Must override method") }
 }
 
 
 class FixedSpread extends SpreadStrategy {
-  constructor(depth, quantity, step) {
+  constructor(depth, amount, step) {
     super()
     this._depth = depth
-    this._quantity = quantity
+    this._amount = amount
     this._step = step
   }
 
   get depth() { return this._depth }
-  get quantity() { return this._quantity }
+  get amount() { return this._amount }
   get step() { return this._step }
 
   generateOrdersFor(price, assets) {
-    return Range(1, this.depth+1).flatMap(i =>
+    return Range(1, this.depth + 1).flatMap(i =>
       List.of(
-        Order.buy(this.quantity, price - (i * this.step), assets),
-        Order.sell(this.quantity, price + (i * this.step), assets)
+        Order.ask(this.amount, price + (i * this.step), assets),
+        Order.bid(this.amount, price - (i * this.step), assets)
       )
     ).toList()
   }
