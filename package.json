@@ -28,9 +28,8 @@
     ]
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "./test/test_helper.js",
+    "setupTestFrameworkScriptFile": "./src/helpers/test_helper.js",
     "testMatch": [
-      "./test/**/*.js?(x)",
       "**/?(*.)(spec|test).js?(x)"
     ]
   },

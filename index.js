@@ -1,5 +1,5 @@
-import makeStore from './src/store'
-import {startServer} from './src/server'
+import makeStore from './src/tutorial/store'
+import {startServer} from './src/tutorial/server'
 
 export const store = makeStore()
 startServer(store)

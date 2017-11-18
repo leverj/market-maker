@@ -4,6 +4,7 @@ export class Exchange {
   place(order) { throw new TypeError("Must override method") }
   update(order) { throw new TypeError("Must override method") }
   cancel(order) { throw new TypeError("Must override method") }
+  currentExchangeRateFor(assets) { throw new TypeError("Must override method") }
 }
 
 
@@ -22,7 +23,7 @@ export class MarketMaker {
 
 
 export class OrderBook {
-  constructor(orders) {
+  constructor(assets, orders) {
     this._assets = assets
     this._orders = orders
   }
