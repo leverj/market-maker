@@ -22,7 +22,7 @@
 
 ###Order
 - a buy or sell (side), in terms of an AssetPair
-- specified as an amount of a primary Asset in terms of the secondary Asset price. Examples:
+- specified as a quantity of a primary Asset in terms of the secondary Asset price. Examples:
   - BUY 10 LEV for 0.28 ETH each
   - SELL 200 LEV for 0.22 ETH each
 
