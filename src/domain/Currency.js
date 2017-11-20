@@ -1,6 +1,6 @@
-export class Currency {
-  static LEV() { return new Currency("LEV") }
-  static ETH() { return new Currency("ETH") }
+export default class Currency {
+  static LEV() { return new Currency('LEV') }
+  static ETH() { return new Currency('ETH') }
 
   static pair(primary, secondary) { return new CurrencyPair(primary, secondary) }
 

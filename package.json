@@ -48,7 +48,10 @@
     "jest": "^21.2.1"
   },
   "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "fetchival": "^0.3.3",
     "immutable": "^3.8.2",
+    "node-fetch": "^1.7.3",
     "redux": "^3.7.2",
     "socket.io": "^2.0.4"
   }

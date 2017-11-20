@@ -1,36 +1,15 @@
 
-export class Exchange {
-  place(order) { throw new TypeError("Must override method") }
-  cancel(order) { throw new TypeError("Must override method") }
-  currentExchangeRateFor(currencies) { throw new TypeError("Must override method") }
-}
-
-
-export class MarketMaker {
-  constructor(strategy, book) {
-    this._strategy = strategy
-    this._book = book
+export default class Exchange {
+  constructor(name, gateway) {
+    this.name = name
+    this.gateway = gateway
   }
 
-  get book() { return this._book }
-  get strategy() { return this._strategy }
+  toString() { return `${this.name} Exchange` }
 
-  onTrade(order) {
-  }
-}
-
-
-export class OrderBook {
-  constructor(currencies, orders) {
-    this._currencies = currencies
-    this._orders = orders
-  }
-
-  get currencies() { return this._currencies }
-  get orders() { return this._orders }
-  get bids() { return this.orders.filter(each => each.way == Way.bid) }
-  get asks() { return this.orders.filter(each => each.way == Way.ask) }
-
-  toString() { return `[${this.currencies} OrderBook] : ${this.orders.size}` }
+  getLastExchangeRateFor(currencies) { return this.gateway.getLastExchangeRateFor(currencies) }
+  // async getLastExchangeRateFor(currencies) { return await this.gateway.getLastExchangeRateFor(currencies.code) }
+  place(order) { return this.gateway.place(order) }
+  cancel(order) { return this.gateway.cancel(order) }
 }
 

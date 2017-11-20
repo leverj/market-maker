@@ -1,11 +1,11 @@
+import * as fixtures from '../helpers/test_fixtures'
 import {List} from 'immutable'
-import {SpreadStrategy} from "./SpreadStrategy"
-import {Way} from "./Order"
-import {Currency} from "./Currency"
+import SpreadStrategy from './SpreadStrategy'
+import {Way} from './Order'
 
 
 describe('Spread Strategy', () => {
-  const currencies = Currency.pair(Currency.LEV(), Currency.ETH())
+  const currencies = fixtures.defaultCurrencyPair
 
   describe('fixed spread', () => {
     const depth = 3, amount = 1, step = 0.1

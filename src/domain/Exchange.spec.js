@@ -1,33 +1,16 @@
-import {Currency} from "./Currency"
-import {Exchange} from "./Exchange"
-
-
-class StubbedExchange extends Exchange {
-  constructor() {
-    super()
-    this._exchangeRate = 0
-  }
-
-  get exchangeRate() { return this._exchangeRate }
-  set exchangeRate(value) { this._exchangeRate = value }
-
-  place(order) { throw new TypeError("Must override method") }
-  cancel(order) { throw new TypeError("Must override method") }
-  currentExchangeRateFor(currencies) { throw new TypeError("Must override method") }
-}
+import Exchange from './Exchange'
+import * as fixtures from '../helpers/test_fixtures'
 
 
 describe('Exchange', () => {
-  const currencies = Currency.pair(Currency.LEV(), Currency.ETH())
-  const exchange = new StubbedExchange()
+  const currencies = fixtures.defaultCurrencyPair
+  const exchange = fixtures.newExchange()
 
-  describe('getting current exchange rate', () => {
-    it('should be able to artificially set it up', () => {
-      expect(exchange.exchangeRate).toBe(0)
+  it('should be able to get the latests exchange rate', async () => {
+    expect(await exchange.getLastExchangeRateFor(currencies)).toBe(0)
 
-      exchange.exchangeRate = 1.25
-      expect(exchange.exchangeRate).toBe(1.25)
-    })
+    exchange.gateway.exchangeRate = 1.25
+    expect(await exchange.getLastExchangeRateFor(currencies)).toBe(1.25)
   })
 
 })

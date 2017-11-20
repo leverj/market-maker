@@ -1,11 +1,11 @@
 import {List, Range} from 'immutable'
-import {Order} from "./Order"
+import Order from './Order'
 
 
-export class SpreadStrategy {
+export default class SpreadStrategy {
   static fixed(depth, amount, step) { return new FixedSpread(depth, amount, step) }
 
-  generateOrdersFor(price, assets) { throw new TypeError("Must override method") }
+  generateOrdersFor(price, currencies) { throw new TypeError('Must override method') }
 }
 
 
@@ -21,11 +21,11 @@ class FixedSpread extends SpreadStrategy {
   get amount() { return this._amount }
   get step() { return this._step }
 
-  generateOrdersFor(price, assets) {
+  generateOrdersFor(price, currencies) {
     return Range(1, this.depth + 1).flatMap(i =>
       List.of(
-        Order.ask(this.amount, price + (i * this.step), assets),
-        Order.bid(this.amount, price - (i * this.step), assets)
+        Order.ask(this.amount, price + (i * this.step), currencies),
+        Order.bid(this.amount, price - (i * this.step), currencies)
       )
     ).toList()
   }
