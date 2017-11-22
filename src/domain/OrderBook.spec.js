@@ -1,7 +1,7 @@
 import * as fixtures from '../helpers/test_fixtures'
 import OrderBook from './OrderBook'
 import Order from './Order'
-import {List, Map} from 'immutable'
+import {List} from 'immutable'
 
 
 describe('OrderBook', () => {
@@ -13,14 +13,14 @@ describe('OrderBook', () => {
     Order.bid(amount, price - 1, currencies, 'id-3'),
     Order.bid(amount, price - 5, currencies, 'id-4'),
   )
-  const book = new OrderBook(currencies, toMap(orders))
+  const book = new OrderBook(currencies, Order.toMap(orders))
 
   describe('construction', () => {
     it('a book can contain only placed orders', () => {
       expect(book.size).toBe(orders.size)
       orders.forEach(each => expect(book.has(each.id)).toBeTruthy())
 
-      expect(() => { new OrderBook(currencies, toMap(orders.push(Order.ask(amount, price, currencies)))) }).
+      expect(() => { new OrderBook(currencies, Order.toMap(orders.push(Order.ask(amount, price, currencies)))) }).
         toThrow(/orders within a book must first be placed \(have an id\)/)
     })
   })
@@ -58,5 +58,3 @@ describe('OrderBook', () => {
   })
 
 })
-
-function toMap(orders) { return  Map(orders.map(each => [each.id, each]))}

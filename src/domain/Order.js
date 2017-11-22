@@ -1,9 +1,11 @@
 import assert from 'assert'
+import {Map} from 'immutable'
 
 
 export default class Order {
   static ask(amount, price, currencies, id='') { return new Order(Way.ask, amount, price, currencies, id) }
   static bid(amount, price, currencies, id='') { return new Order(Way.bid, amount, price, currencies, id) }
+  static toMap(orders) { return  Map(orders.map(each => [each.id, each]))}
 
   constructor(way, amount, price, currencies, id='') {
     assert(amount >= 0, `${amount} : amount must be non-negative`)

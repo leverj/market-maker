@@ -1,15 +1,12 @@
 import Gatecoin from './Gatecoin'
+import {config} from '../config'
 
 
-describe('gateway api', () => {
-  const apiKey = 'get real'
-  const currencyPair = 'BTCUSD'
-  // const site = 'https://api.gatecoin.com'
-  const site = 'https://api.gtcprojects.com'
-  const gateway = new Gatecoin(site, apiKey)
+describe.skip('gateway api', () => {
+  const gateway = new Gatecoin(config.Gatecoin.site, config.Gatecoin.apiKey)
 
-  it.skip('should get live ticker', async () => {
-    const response = await gateway.getLastExchangeRateFor(currencyPair)
+  it('should get live ticker', async () => {
+    const response = await gateway.getLastExchangeRateFor(config.Gatecoin.currencyPair)
     console.log('***************************************************************')
     console.log(await response)
     console.log('***************************************************************')

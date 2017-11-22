@@ -1,17 +1,12 @@
 import Currency from '../domain/Currency'
 import Exchange from '../domain/Exchange'
+import StubbedGateway from './StubbedGateway'
 
 
 export const defaultCurrencyPair = Currency.pair(Currency.LEV(), Currency.ETH())
-export function newExchange() { return new Exchange('test', new StubbedGateway()) }
 
+export const newExchange = () => new Exchange('test', new StubbedGateway())
 
-class StubbedGateway {
-  constructor() { this._exchangeRate = 0 }
-  set exchangeRate(value) { this._exchangeRate = value }
+export const uuid = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 
-  getLastExchangeRateFor(currencies) { return Promise.resolve(this._exchangeRate) }
-  place(order) { throw new TypeError('Must override method') }
-  cancel(order) { throw new TypeError('Must override method') }
-}
 
