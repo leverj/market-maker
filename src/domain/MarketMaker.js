@@ -11,7 +11,7 @@ export class MarketMaker {
 
   onTrade(order) {
     const updated = this.book.offset(order)
-    if (!updated.contains(order.id)) { // order been filled
+    if (!updated.get(order.id)) { // order been filled
 
     }
 
