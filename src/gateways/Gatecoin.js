@@ -17,18 +17,26 @@ export default class Gatecoin extends ExchangeGateway {
     this.tickers = `${site}/Public/LiveTicker`
     this.orders = `${site}//Trade/Orders`
     // this.balances = `${site}/Balance/Balances`
+    if (!this.isAlive()) console.log(`${site} api is offline :-(`)
   }
 
   options(settings) {
-    const contentType = (settings.type == 'GET') ? '' : 'application/json';
-    const message = settings.type + settings.url + contentType + new Date();
-    const hash = CryptoJS.HmacSHA256(message.toLowerCase(), this.apiKey);
-    const signature = CryptoJS.enc.Base64.stringify(hash);
+    const command = '???' //fixme: method?
+    // const now = new Date()
+    const now = nonce()
+    const contentType = (settings.type == 'GET') ? '' : 'application/json'
+    const uri = url + command
+    const message = (settings.type + settings.url + command + contentType + now).toLowerCase()
+    //signature = hmac.new(self.secret.encode(), msg=message_to_encrypt.encode(), digestmod=hashlib.sha256).digest()
+    //signature_base64 = base64.b64encode(signature, altchars=None)
+    const hash = CryptoJS.HmacSHA256(message, this.apiKey) //fixme: self.secret.encode() ???
+    const signature = CryptoJS.enc.Base64.stringify(hash)
     return {
       headers: {
         'API_PUBLIC_KEY': this.apiKey,
         'API_REQUEST_SIGNATURE': signature,
-        'API_REQUEST_DATE': new Date()
+        'API_REQUEST_DATE': new Date(),
+        'Content-Type': contentType
       }
     }
   }
@@ -36,7 +44,7 @@ export default class Gatecoin extends ExchangeGateway {
   isAlive() {
     const url = this.ping
     return rest(url, this.options({type: 'POST', url: url})).get().
-      then((result) => result.IsConnected). //fixme: clarify
+      then((result) => result.IsConnected).
       catch(this.exceptionHandler)
   }
 
@@ -53,29 +61,47 @@ export default class Gatecoin extends ExchangeGateway {
       Way: order.way,
       Amount: order.amount,
       Price: order.price,
-      //fixme: clarify
-      SpendAmount: "what's that?",
-      ExternalOrderID: "what's that?",
-      ValidationCode: "what's that?"
-    }
-    const body = {
-      AddOrder: {fixme: "what's that?"},
+      SpendAmount: 0, //fixme: SpendAmount is used in case of Buy MarketOrder, telling how much you are expecting to buy.
+      // ExternalOrderID: '', // ExternalOrderID could be used as a reference for you
+      // ValidationCode: '' // ValidationCode is the 2FA code if enables
     }
     const url = `${this.orders}/?${toQueryString(parameters)}`
-    return rest(url, this.options({type: 'POST', url: url})).post(body).
-      then((result) => order.placeWithId(result.ClOrderId)). //fixme: clarify
+    return rest(url, this.options({type: 'POST', url: url})).post().
+      then((result) => order.placeWithId(result.ClOrderId)).
       catch(this.exceptionHandler)
   }
 
   cancel(order) {
     const url = `${this.orders}/${order.id}`
-    const body = {
-      CancelOrder: {fixme: "what's that?"},
-    }
-    return rest(url, this.options({type: 'DELETE', url: url})).delete(body).
+    return rest(url, this.options({type: 'DELETE', url: url})).delete().
+      then((result) => result.ResponseStatus.ErrorCode). //fixme: clarify
+      catch(this.exceptionHandler)
+  }
+
+  currentOrdersStatus() {
+    const url = this.orders
+    return rest(url, this.options({type: 'GET', url: url})).get().
       then((result) => result.ResponseStatus.ErrorCode). //fixme: clarify
       catch(this.exceptionHandler)
   }
 }
 
 const toQueryString = (parmeters) => parameters.map((v,k) => `${k}=${v}`).join('&')
+
+const Nonce = function (length) {
+  let last = null, repeat = 0
+  if (typeof length == 'undefined') length = 15
+  return function () {
+    const now = Math.pow(10, 2) * +new Date()
+    if (now == last)
+      repeat++
+    else {
+      repeat = 0
+      last = now
+    }
+    const s = (now + repeat).toString()
+    return +s.substr(s.length - length)
+  }
+}
+const nonce = Nonce()
+// const nonce = (Math.random() * +new Date()).toString(36).replace(/[^a-z]/, '').substr(2)

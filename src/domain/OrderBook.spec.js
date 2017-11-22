@@ -5,6 +5,7 @@ import {List} from 'immutable'
 
 
 describe('OrderBook', () => {
+
   const currencies = fixtures.defaultCurrencyPair
   const amount = 10, price = 110.0
   const orders = List.of(
@@ -13,14 +14,14 @@ describe('OrderBook', () => {
     Order.bid(amount, price - 1, currencies, 'id-3'),
     Order.bid(amount, price - 5, currencies, 'id-4'),
   )
-  const book = new OrderBook(currencies, Order.toMap(orders))
+  const book = OrderBook.from(currencies, orders)
 
   describe('construction', () => {
     it('a book can contain only placed orders', () => {
       expect(book.size).toBe(orders.size)
-      orders.forEach(each => expect(book.has(each.id)).toBeTruthy())
+      orders.forEach(each => expect(book.hasOrder(each.id)).toBeTruthy())
 
-      expect(() => { new OrderBook(currencies, Order.toMap(orders.push(Order.ask(amount, price, currencies)))) }).
+      expect(() => { OrderBook.from(currencies, orders.push(Order.ask(amount, price, currencies))) }).
         toThrow(/orders within a book must first be placed \(have an id\)/)
     })
   })
@@ -41,19 +42,19 @@ describe('OrderBook', () => {
 
     it('should deduct and maintain an order if amount is smaller then existing order', () => {
       const orderId = 'id-1'
-      const toOffset = book.get(orderId).minus(1)
+      const toOffset = book.getOrder(orderId).minus(1)
       const deducted = book.offset(toOffset)
       expect(deducted.size).toBe(book.size)
-      expect(deducted.has(orderId)).toBeTruthy()
-      expect(deducted.get(orderId).amount).toBe(1)
+      expect(deducted.hasOrder(orderId)).toBeTruthy()
+      expect(deducted.getOrder(orderId).amount).toBe(1)
     })
 
     it('should deduct and eliminate an order if amount is equal then existing order', () => {
       const orderId = 'id-1'
-      const toOffset = book.get(orderId)
+      const toOffset = book.getOrder(orderId)
       const deducted = book.offset(toOffset)
       expect(deducted.size).toBe(book.size - 1)
-      expect(deducted.has(orderId)).toBeFalsy()
+      expect(deducted.hasOrder(orderId)).toBeFalsy()
     })
   })
 

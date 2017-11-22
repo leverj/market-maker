@@ -1,29 +1,26 @@
-export default class Currency {
-  static LEV() { return new Currency('LEV') }
-  static ETH() { return new Currency('ETH') }
+import {Map} from 'immutable'
+import ImmutableObject from './ImmutableObject'
 
-  static pair(primary, secondary) { return new CurrencyPair(primary, secondary) }
 
-  constructor(symbol) {
-    this._symbol = symbol
-  }
+export default class Currency extends ImmutableObject {
+  static from(symbol) { return new Currency(Map({symbol: symbol})) }
+  static LEV() { return Currency.from('LEV') }
+  static ETH() { return Currency.from('ETH') }
+  static pair(primary, secondary) { return CurrencyPair.from(primary, secondary) }
 
-  get symbol() { return this._symbol }
-
+  constructor(map) { super(map) }
+  get symbol() { return this.get('symbol') }
   toString() { return this.symbol }
 }
 
 
-class CurrencyPair {
-  constructor(primary, secondary) {
-    this._primary = primary
-    this._secondary = secondary
-  }
+class CurrencyPair extends ImmutableObject {
+  static from(primary, secondary) { return new CurrencyPair(Map({primary: primary.map, secondary: secondary.map})) }
 
-  get primary() { return this._primary }
-  get secondary() { return this._secondary }
+  constructor(map) { super(map) }
+  get primary() { return this.get('primary') }
+  get secondary() { return this.get('secondary') }
   get code() { return `${this.primary}${this.secondary}` }
-
   toString() { return `${this.primary}<->${this.secondary}` }
 }
 

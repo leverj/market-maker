@@ -1,7 +1,0 @@
-GET Tickers
-
-[api-key] POST Orders
-
-[api-key] GET Orders
-
-[api-key] DELETE Orders

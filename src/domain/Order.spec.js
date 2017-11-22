@@ -11,6 +11,8 @@ describe('Order', () => {
   describe('construction', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
       expect(order.id).toBe('')
+      expect(order.isAsk).toBeTruthy()
+      expect(order.isBid).toBeFalsy()
       expect(order.isPlaced).toBeFalsy()
     })
 
@@ -32,8 +34,8 @@ describe('Order', () => {
       expect(order.isRelatedTo(Order.ask(amount - 1, price, currencies))).toBeTruthy()
       expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.ETH())))).toBeTruthy()
 
-      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(new Currency('whatever'), Currency.ETH())))).toBeFalsy()
-      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), new Currency('whatever'))))).toBeFalsy()
+      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.from('whatever'), Currency.ETH())))).toBeFalsy()
+      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.from('whatever'))))).toBeFalsy()
       expect(order.isRelatedTo(Order.ask(amount, price + 1.00, currencies))).toBeFalsy()
       expect(order.isRelatedTo(Order.bid(amount, price, currencies))).toBeFalsy()
     })

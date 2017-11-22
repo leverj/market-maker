@@ -22,7 +22,7 @@ export class MarketMaker {
       const {toBeCanceled, toRemainUnchanged, toBePlaced} = diff(book.orders, newSpreadOrders)
       const cancelled = toBeCanceled.map(await exchange.cancel(each)) //fixme: all at once
       const placed = toBePlaced.map(await exchange.place(each)) //fixme: all at once
-      this._book = new OrderBook(book.currencies, toRemainUnchanged.merge(placed))
+      this._book = OrderBook.from(book.currencies, toRemainUnchanged.merge(placed))
     }
   }
 

@@ -6,6 +6,7 @@ build/
 coverage/
 logs/
 *.log
+src/config.js
 
 .idea/
 .DS_Store
