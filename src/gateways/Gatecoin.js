@@ -1,107 +1,140 @@
-import ExchangeGateway from './ExchangeGateway'
+import {List, Map} from 'immutable'
 import CryptoJS from 'crypto-js'
 import fetchival from 'fetchival'
 import fetch from 'node-fetch'
+import ExchangeGateway from './ExchangeGateway'
 
 
 fetchival.fetch = fetch
 const rest = fetchival
 
 
+//fixme: configure time out for all Promises
 export default class Gatecoin extends ExchangeGateway {
-  constructor(site, apiKey, exceptionHandler = (e) => console.log(`>>>>> ${e} <<<<<`)) {
+  constructor(config, exceptionHandler) {
     super()
-    this.apiKey = apiKey
+    this.config = config
     this.exceptionHandler = exceptionHandler
-    this.ping = `${site}/Ping`
-    this.tickers = `${site}/Public/LiveTicker`
-    this.orders = `${site}//Trade/Orders`
-    // this.balances = `${site}/Balance/Balances`
-    if (!this.isAlive()) console.log(`${site} api is offline :-(`)
+    if (!this.isAlive()) console.log(`${apiUrl} api is offline :-(`)
   }
 
-  options(settings) {
-    const command = '???' //fixme: method?
-    // const now = new Date()
-    const now = nonce()
-    const contentType = (settings.type == 'GET') ? '' : 'application/json'
-    const uri = url + command
-    const message = (settings.type + settings.url + command + contentType + now).toLowerCase()
-    //signature = hmac.new(self.secret.encode(), msg=message_to_encrypt.encode(), digestmod=hashlib.sha256).digest()
-    //signature_base64 = base64.b64encode(signature, altchars=None)
-    const hash = CryptoJS.HmacSHA256(message, this.apiKey) //fixme: self.secret.encode() ???
+  options(method, url) {
+    const contentType = method == 'GET' ? '' : 'application/json'
+    const now = +new Date() / 1000
+    const message = `${method}${url}${contentType}${now}`.toLowerCase()
+    const hash = CryptoJS.HmacSHA256(message, this.config.privateKey)
     const signature = CryptoJS.enc.Base64.stringify(hash)
     return {
+      url: url,
+      strictSSL: false,
+      method: method,
       headers: {
-        'API_PUBLIC_KEY': this.apiKey,
+        'API_PUBLIC_KEY': this.config.publicKey,
         'API_REQUEST_SIGNATURE': signature,
-        'API_REQUEST_DATE': new Date(),
+        'API_REQUEST_DATE': now,
         'Content-Type': contentType
       }
     }
   }
 
   isAlive() {
-    const url = this.ping
-    return rest(url, this.options({type: 'POST', url: url})).get().
-      then((result) => result.IsConnected).
+    const endpoint = '/Ping'
+    const url = `${this.config.apiUrl}${endpoint}?message=pong`
+    return rest(url, this.options('POST', url)).post().
+      then((response) => response.isConnected).
       catch(this.exceptionHandler)
   }
 
-  getLastExchangeRateFor(currencyPair) {
-    const url = `${this.tickers}/${currencyPair}`
-    return rest(url, this.options({type: 'GET', url: url})).get().
-      then((result) => result.ticker.last).
+  async getCurrentOrdersFor(currencies) {
+/*
+     { orders:
+         [ { code: 'BTCUSD',
+             clOrderId: 'BK11492580104',
+             side: 1,
+             price: 999000000000000,
+             initialQuantity: 2,
+             remainingQuantity: 2,
+             status: 1,
+             statusDesc: 'New',
+             tranSeqNo: 0,
+             type: 0,
+             date: '1511506668' },
+OpenOrder {
+  Code (string),
+  ClOrderId (string),
+  OrigClOrderId (string), //optional
+  Side (byte),
+  Price (double),
+  InitialQuantity (double),
+  RemainingQuantity (double),
+  Status (byte),
+  StatusDesc (string),
+  TranSeqNo (long),
+  Type (byte),
+  Date (Date),
+  Trades (Array[TraderTransaction]) //optional
+}
+  TraderTransaction {
+  TransactionId (long),
+  TransactionTime (Date),
+  AskOrderID (string),
+  BidOrderID (string),
+  Price (double),
+  Quantity (double),
+  CurrencyPair (string),
+  Way (string),
+  FeeRole (string),
+  FeeRate (double),
+  FeeAmount (double)
+}
+ */
+    const endpoint = '/Trade/Orders'
+    const url = `${this.config.apiUrl}${endpoint}`
+    return rest(url, this.options('GET', url)).get().
+      then((response) => response).
+      // then((response) => List(response.orders).filter(each => each.code == currencies.code)).
+      catch(this.exceptionHandler)
+  }
+
+  getLastExchangeRateFor(currencies) {
+    const endpoint = '/Public/LiveTicker'
+    const url = `${this.config.apiUrl}${endpoint}/${currencies.code}`
+    return rest(url, this.options('GET', url)).get().
+      then((response) => response.ticker.last).
       catch(this.exceptionHandler)
   }
 
   place(order) {
     const parameters = {
-      Code: order.currencies.code,
+      Code: order.currenciesCode,
       Way: order.way,
       Amount: order.amount,
       Price: order.price,
-      SpendAmount: 0, //fixme: SpendAmount is used in case of Buy MarketOrder, telling how much you are expecting to buy.
-      // ExternalOrderID: '', // ExternalOrderID could be used as a reference for you
-      // ValidationCode: '' // ValidationCode is the 2FA code if enables
+      // SpendAmount: 0, // used in case of Buy MarketOrder, telling how much you are expecting to buy.
     }
-    const url = `${this.orders}/?${toQueryString(parameters)}`
-    return rest(url, this.options({type: 'POST', url: url})).post().
-      then((result) => order.placeWithId(result.ClOrderId)).
+    const endpoint = '/Trade/Orders'
+    const url = `${this.config.apiUrl}${endpoint}?${toQueryString(parameters)}`
+    return rest(url, this.options('POST', url)).post().
+      then((response) => check(response)).
+      then((response) => response.clOrderId).
       catch(this.exceptionHandler)
   }
 
   cancel(order) {
-    const url = `${this.orders}/${order.id}`
-    return rest(url, this.options({type: 'DELETE', url: url})).delete().
-      then((result) => result.ResponseStatus.ErrorCode). //fixme: clarify
-      catch(this.exceptionHandler)
-  }
-
-  currentOrdersStatus() {
-    const url = this.orders
-    return rest(url, this.options({type: 'GET', url: url})).get().
-      then((result) => result.ResponseStatus.ErrorCode). //fixme: clarify
+    const endpoint = '/Trade/Orders'
+    const url = `${this.config.apiUrl}${endpoint}/${order.id}`
+    return rest(url, this.options('DELETE', url)).delete().
+      then((response) => check(response)).
+      then((response) => response).
       catch(this.exceptionHandler)
   }
 }
 
-const toQueryString = (parmeters) => parameters.map((v,k) => `${k}=${v}`).join('&')
-
-const Nonce = function (length) {
-  let last = null, repeat = 0
-  if (typeof length == 'undefined') length = 15
-  return function () {
-    const now = Math.pow(10, 2) * +new Date()
-    if (now == last)
-      repeat++
-    else {
-      repeat = 0
-      last = now
-    }
-    const s = (now + repeat).toString()
-    return +s.substr(s.length - length)
-  }
+const check = (response) => isOK(response) ? response : throwError(response)
+const isOK = (response) => response.responseStatus.message == 'OK'
+const throwError = (response) => {
+  const {errorCode, message} = response.responseStatus
+  throw new Error(`[${errorCode}] ${message}`)
 }
-const nonce = Nonce()
-// const nonce = (Math.random() * +new Date()).toString(36).replace(/[^a-z]/, '').substr(2)
+
+const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')

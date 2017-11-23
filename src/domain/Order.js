@@ -3,6 +3,9 @@ import {Map} from 'immutable'
 import ImmutableObject from './ImmutableObject'
 
 
+/** I start as an intention to trade on an exchange an amount of a primary currency in terms of a secondary currency.
+ * once I'm placed to be traded in an exchange I become part of an order book, until I am fulfilled (either sold or bought in full)
+ */
 export default class Order extends ImmutableObject {
   static from(way, amount, price, currencies, id='') {
     assert(amount >= 0, `${amount} : amount must be non-negative`)
@@ -24,12 +27,13 @@ export default class Order extends ImmutableObject {
   get amount() { return this.map.get('amount') }
   get price() { return this.map.get('price')}
   get currencies() { return this.map.get('currencies') }
+  get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
   get isBid() { return this.way == Way.bid}
   get isAsk() { return this.way == Way.ask }
   get isPlaced() { return !!this.id }
   toString() { return `[${this.id}] ${this.way} ${this.amount} ${this.currencies.primary} @ ${this.price} ${this.currencies.secondary}` }
 
-  placeWithId(id) { return Order.from(this.way, this.amount, this.price, this.currencies, id) }
+  placeWithId(id) { return new Order(this.map.merge({id: id})) }
 
   isRelatedTo(that) {
     return (
@@ -46,10 +50,10 @@ export default class Order extends ImmutableObject {
   }
   minus(amount) {
     assert(this.amount >= amount, `deducted amount ${amount} cannot be greater then ${this.amount}`)
-    return new Order(this.map.set('amount', this.amount - amount))
+    return new Order(this.map.merge({amount: this.amount - amount}))
   }
   plus(amount) {
-    return new Order(this.map.set('amount', this.amount + amount))
+    return new Order(this.map.merge({amount: this.amount + amount}))
   }
 }
 

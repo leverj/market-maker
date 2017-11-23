@@ -1,19 +1,30 @@
-import * as fixtures from '../helpers/test_fixtures'
+import {lev2eth} from '../helpers/test_fixtures'
 import Order from './Order'
 import Currency from './Currency'
 
 
 describe('Order', () => {
-  const currencies = fixtures.defaultCurrencyPair
+  const currencies = lev2eth
   const amount = 10, price = 10.50
   const order = Order.ask(amount, price, currencies)
 
   describe('construction', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
       expect(order.id).toBe('')
-      expect(order.isAsk).toBeTruthy()
-      expect(order.isBid).toBeFalsy()
-      expect(order.isPlaced).toBeFalsy()
+      expect(order.isAsk)
+      expect(!order.isBid)
+      expect(!order.isPlaced)
+      expect(order.toJS()).toEqual({
+        id: '',
+        way: 'Ask',
+        amount: 10,
+        price: 10.5,
+        currencies: {
+          primary: {symbol: 'LEV'},
+          secondary: {symbol: 'ETH'},
+          code: 'LEVETH'
+        }
+      })
     })
 
     it('an order should have valid amount & price', () => {
@@ -23,21 +34,21 @@ describe('Order', () => {
 
     it('an order is placed by assigning id', () => {
       const placedOrder = order.placeWithId('test-id')
-      expect(order.isPlaced).toBeFalsy()
-      expect(placedOrder.isPlaced).toBeTruthy()
+      expect(!order.isPlaced)
+      expect(placedOrder.isPlaced)
     })
   })
 
   describe('difference', () => {
     it('should discern if orders related (primary requirement for computing the diff)', () => {
-      expect(order.isRelatedTo(Order.ask(amount, price, currencies))).toBeTruthy()
-      expect(order.isRelatedTo(Order.ask(amount - 1, price, currencies))).toBeTruthy()
-      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.ETH())))).toBeTruthy()
+      expect(order.isRelatedTo(Order.ask(amount, price, currencies)))
+      expect(order.isRelatedTo(Order.ask(amount - 1, price, currencies)))
+      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.ETH()))))
 
-      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.from('whatever'), Currency.ETH())))).toBeFalsy()
-      expect(order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.from('whatever'))))).toBeFalsy()
-      expect(order.isRelatedTo(Order.ask(amount, price + 1.00, currencies))).toBeFalsy()
-      expect(order.isRelatedTo(Order.bid(amount, price, currencies))).toBeFalsy()
+      expect(!order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.from('whatever'), Currency.ETH()))))
+      expect(!order.isRelatedTo(Order.ask(amount, price, Currency.pair(Currency.LEV(), Currency.from('whatever')))))
+      expect(!order.isRelatedTo(Order.ask(amount, price + 1.00, currencies)))
+      expect(!order.isRelatedTo(Order.bid(amount, price, currencies)))
     })
 
     it('compute the difference from a related order', () => {

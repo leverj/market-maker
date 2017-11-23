@@ -1,15 +1,16 @@
+import assert from 'assert'
+
 
 export default class Exchange {
   constructor(name, gateway) {
     this.name = name
     this.gateway = gateway
   }
-
   toString() { return `${this.name} Exchange` }
 
-  getLastExchangeRateFor(currencies) { return this.gateway.getLastExchangeRateFor(currencies) }
-  // async getLastExchangeRateFor(currencies) { return await this.gateway.getLastExchangeRateFor(currencies.code) }
-  place(order) { return this.gateway.place(order) }
-  cancel(order) { return this.gateway.cancel(order) }
+  async getCurrentOrdersFor(currencies) { return this.gateway.getCurrentOrdersFor(currencies) }
+  async getLastExchangeRateFor(currencies) { return this.gateway.getLastExchangeRateFor(currencies) }
+  async place(order) { return this.gateway.place(order).then(id => order.placeWithId(id)) }
+  async cancel(order) { return this.gateway.cancel(order) }
 }
 

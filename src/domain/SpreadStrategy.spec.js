@@ -1,11 +1,10 @@
-import * as fixtures from '../helpers/test_fixtures'
+import {lev2eth} from '../helpers/test_fixtures'
 import {List} from 'immutable'
 import SpreadStrategy from './SpreadStrategy'
-import {Way} from './Order'
 
 
 describe('Spread Strategy', () => {
-  const currencies = fixtures.defaultCurrencyPair
+  const currencies = lev2eth
 
   describe('fixed spread', () => {
     const depth = 3, amount = 1, step = 0.1
@@ -15,8 +14,8 @@ describe('Spread Strategy', () => {
       it('should generate symmetric bid & ask orders', () => {
         const price = 10.50
         const orders = spread.generateOrdersFor(price, currencies)
-        const bids = orders.filter(each => each.way == Way.bid)
-        const asks = orders.filter(each => each.way == Way.ask)
+        const bids = orders.filter(each => each.isBid)
+        const asks = orders.filter(each => each.isAsk)
 
         expect(orders.size).toBe(spread.depth * 2)
         expect(bids.size).toBe(spread.depth)

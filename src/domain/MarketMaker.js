@@ -1,35 +1,54 @@
+import OrderBook from './OrderBook'
 
-export class MarketMaker {
-  constructor(strategy, book, exchange) {
-    this._strategy = strategy
-    this._book = book
-    this._exchange = exchange
+
+/**
+ * I maintain a spread of ask & bid order to keep the market "happening" i n an exchange
+ * as trading events happen, I adjust positions using a spread strategy
+ */
+export default class MarketMaker {
+  static async from(exchange, strategy, currencies) {
+    const orders = await exchange.getCurrentOrdersFor(currencies)
+    const book = OrderBook.from(currencies, orders)
+    return new MarketMaker(exchange, strategy, book)
   }
 
+  constructor(exchange, strategy, book) {
+    this.exchange = exchange
+    this.strategy = strategy
+    this._book = book
+    // if (this.book.size == 0) this.recalibrate()
+  }
   get book() { return this._book }
+  get currencies() { return this.book.currencies }
 
   /** on notification of a trade (of an existing order):
    * 1. offset the book with the traded order
-   * 2. if the order is fulfilled,
-   *  a. compute the necessary changes based on the strategy
-   *  b. move the book to newly computed positions
+   * 2. if the order is fulfilled, simply:
+   *  a. cancel all existing orders
+   *  b. compute new positions based spread strategy & last traded price
+   *  c. place orders for new positions
    */
   async onTrade(order) {
-    const updated = this.book.offset(order)
-    if (!updated.has(order.id)) { // order been filled
-      const price = exchange.getLastExchangeRateFor(currencies) //fixme: or fulfilled order.price ?
-      const newSpreadOrders = strategy.generateOrdersFor(price, currencies)
-      const {toBeCanceled, toRemainUnchanged, toBePlaced} = diff(book.orders, newSpreadOrders)
-      const cancelled = toBeCanceled.map(await exchange.cancel(each)) //fixme: all at once
-      const placed = toBePlaced.map(await exchange.place(each)) //fixme: all at once
-      this._book = OrderBook.from(book.currencies, toRemainUnchanged.merge(placed))
-    }
+    this._book = this.book.offset(order)
+    if (!this.book.hasOrder(order.id)) /* order been filled */ await this._recalibrate()
   }
 
-  /** compute the orders that would move a book from before to after */
-  diff(before, after) {
-    //fixme
-    return {toBeCanceled: before, toRemainUnchanged: before, toBePlaced: before}
+  async _recalibrate2() {
+    const price = await this.exchange.getLastExchangeRateFor(this.currencies) //fixme: or fulfilled order.price ?
+    const newOrders = this.strategy.generateOrdersFor(price, this.currencies)
+    const toStay = List()  //fixme
+    const toCancel = this.book.orders  //fixme
+    const toPlace = newOrders  //fixme
+    await Promise.all(toCancel.map(each => this.exchange.cancel(each)))
+    const placed = await Promise.all(toPlace.map(each => this.exchange.place(each)))
+    this._book = OrderBook.from(this.currencies, toStay + placed) //fixme
+  }
+  async recalibrate() {
+    Promise.all(this.book.orders.map(each => this.exchange.cancel(each)))
+    const price = this.exchange.getLastExchangeRateFor(this.currencies) //fixme: or fulfilled order.price ?
+    const newPositions = this.strategy.generateOrdersFor(price, this.currencies)
+    this._book = await Promise.all(newPositions.map(each => this.exchange.place(each))).
+      then(placed => OrderBook.from(this.currencies, placed))
   }
 }
 
