@@ -27,15 +27,16 @@ export default class OrderBook extends ImmutableObject {
   getOrder(id) { return new Order(this.getIn(['orders', id])) }
   hasOrder(id) { return this.hasIn(['orders', id]) }
 
-  offset(order) {
-    assert(order.isPlaced, `can only offset a placed order: ${order}`)
-    assert(this.hasOrder(order.id), `can only offset an existing order: ${order}`)
-    const offsetOrder = this.getOrder(order.id).deduct(order)
-    return offsetOrder.amount == 0 ? this._delete(offsetOrder) : this._update(offsetOrder)
+  offset(tradedOrder) {
+    assert(this.hasOrder(tradedOrder.id), `can only offset an existing order: ${tradedOrder}`)
+    const existingOrder = this.getOrder(tradedOrder.id)
+    assert(existingOrder.isRelatedTo(tradedOrder), `can only offset a related order \n\t${existingOrder}\n\t${tradedOrder}`)
+    return tradedOrder.isFulfilled ?
+      this.remove(tradedOrder) :
+      this.usurp(tradedOrder)
   }
 
-  _delete(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
-  _update(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
-  _add(order) { return this._update(order) }
+  remove(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
+  usurp(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
 }
 

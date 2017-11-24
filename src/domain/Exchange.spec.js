@@ -4,9 +4,9 @@ import Exchange from './Exchange'
 
 describe('Exchange', () => {
   const currencies = lev2eth
-  const exchange = newStubbedExchange()
 
   it('should be able to get the latests exchange rate', async () => {
+    const exchange = newStubbedExchange()
     expect(await exchange.getLastExchangeRateFor(currencies)).toBe(0)
 
     exchange.gateway.setExchangeRate(1.25)

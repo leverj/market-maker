@@ -7,8 +7,8 @@ describe('Spread Strategy', () => {
   const currencies = lev2eth
 
   describe('fixed spread', () => {
-    const depth = 3, amount = 1, step = 0.1
-    const spread = SpreadStrategy.fixed(depth, amount, step)
+    const depth = 3, quantity = 1, step = 0.1
+    const spread = SpreadStrategy.fixed(depth, quantity, step)
 
     describe('generating orders', () => {
       it('should generate symmetric bid & ask orders', () => {
@@ -22,7 +22,7 @@ describe('Spread Strategy', () => {
         expect(asks.size).toBe(spread.depth)
         expect(bids.map(each => each.price)).toEqual(List.of(10.4, 10.3, 10.2))
         expect(asks.map(each => each.price)).toEqual(List.of(10.6, 10.7, 10.8))
-        orders.forEach(each => expect(each.amount).toBe(spread.amount))
+        orders.forEach(each => expect(each.quantity).toBe(spread.quantity))
       })
     })
 

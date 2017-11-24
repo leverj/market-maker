@@ -32,13 +32,13 @@ export class StubbedGateway extends ExchangeGateway {
 
   async place(order) { return Promise.resolve(this._place(order)) }
   _place(order) {
-    const placed = order.placeWithId(`id_${uuidv4()}`)
-    this.book = this.book._add(placed)
+    const placed = order.placeWith(`id_${uuidv4()}`)
+    this.book = this.book.usurp(placed)
     return placed.id
   }
 
   async cancel(order) {
-    this.book = this.book._delete(order)
+    this.book = this.book.remove(order)
     return Promise.resolve(true)
   }
 }
