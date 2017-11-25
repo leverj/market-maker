@@ -9,10 +9,10 @@ fetchival.fetch = fetch
 const rest = fetchival
 
 
-//fixme: configure time out for all Promises
+//fixme: configure time out for all rest calls
 export default class Gatecoin extends ExchangeGateway {
   constructor(config, exceptionHandler) {
-    super(exceptionHandler)
+    super("Gatecoin", exceptionHandler)
     this.config = config
     if (!this.isAlive()) console.log(`${apiUrl} api is offline :-(`)
   }

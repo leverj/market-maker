@@ -1,4 +1,5 @@
-import {exceptionHandler, print, sleep} from '../helpers/testing/utils'
+import {exceptionHandler, print} from '../helpers/testing/utils'
+import {sleep} from '../common/promises'
 import Currency from '../domain/Currency'
 import Order from '../domain/Order'
 import Gatecoin from './Gatecoin'
@@ -10,7 +11,7 @@ import {config} from '../config'
  */
 // describe('Gatecoin api', () => {
 describe.skip('Gatecoin api', () => {
-  const gateway = new Gatecoin(config.Gatecoin, exceptionHandler)
+  const gateway = new Gatecoin(config.gateways.Gatecoin_test, exceptionHandler)
   const currencies = Currency.pair(Currency.of('BTC'), Currency.of('USD'))
 
   it('api should be connected', async () => {
@@ -39,8 +40,8 @@ describe.skip('Gatecoin api', () => {
     print(`placed order ${orderId}`)
     expect(!!orderId).toBe(true)
 
-    // better clean up ...
-    // await sleep(1000)
+    // give it some time, then clean up ...
+    await sleep(1000)
     const cancelled = await gateway.cancel(order) //fixme: broken :-(
     print(`cancelled order ${orderId}: ${cancelled}`)
   })

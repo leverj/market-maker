@@ -1,4 +1,10 @@
-
+/**
+ * needless to say, I am immutable ...
+ *
+ * all my subclasses are composed of a single Immutable.Map.
+ * subclasses provide convenience getters, and of course, no setters:
+ * any modification is a T(Map) -> T(Map) transformation.
+ */
 export default class ImmutableObject {
   constructor(map) { this.map = map }
   equals(that) { return this.map.equals(that.map) }

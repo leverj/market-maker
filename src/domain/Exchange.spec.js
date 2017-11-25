@@ -1,12 +1,18 @@
-import {lev2eth, newStubbedExchange} from '../helpers/testing/fixtures'
+import * as fixtures from '../helpers/testing/fixtures'
 import Exchange from './Exchange'
 
 
 describe('Exchange', () => {
-  const currencies = lev2eth
+  const currencies = fixtures.currencies
 
-  it('should be able to get the latests exchange rate', async () => {
-    const exchange = newStubbedExchange()
+  it('should get its name from its gateway', async () => {
+    const exchange = fixtures.exchange()
+    exchange.gateway.setExchangeRate(1.25)
+    expect(exchange.toString()).toEqual('Playground Exchange')
+  })
+
+  it('should be able to get the latest exchange rate', async () => {
+    const exchange = fixtures.exchange()
     expect(await exchange.getLastExchangeRateFor(currencies)).toBe(0)
 
     exchange.gateway.setExchangeRate(1.25)

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import ImmutableObject from '../common/ImmutableObject'
 import Order from './Order'
 
@@ -8,9 +8,9 @@ import Order from './Order'
  * my orders are placed or cancelled by a MarketMaker
  */
 export default class OrderBook extends ImmutableObject {
-  static of(currencies, orders) {
+  static of(currencies, orders = List()) {
     orders.forEach(each => assert(each.isPlaced, 'orders within a book must first be placed (have an id)'))
-    return OrderBook.fromOrdersMap(currencies, ordersToMap(orders))
+    return this.fromOrdersMap(currencies, ordersToMap(orders))
   }
   static fromOrdersMap(currencies, ordersMap) {
     return new OrderBook(Map({currencies: currencies.map, orders: ordersMap}))
@@ -32,12 +32,12 @@ export default class OrderBook extends ImmutableObject {
     const existingOrder = this.getOrder(tradedOrder.id)
     assert(existingOrder.isRelatedTo(tradedOrder), `can only offset a related order \n\t${existingOrder}\n\t${tradedOrder}`)
     return tradedOrder.isFulfilled ?
-      this.remove(tradedOrder) :
-      this.usurp(tradedOrder)
+      this.without(existingOrder) :
+      this.mergeWith(tradedOrder)
   }
 
-  remove(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
-  usurp(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
+  without(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
+  mergeWith(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
 }
 
 

@@ -20,8 +20,8 @@ export default class Order extends ImmutableObject {
       remaining: quantity,
     }))
   }
-  static ask(quantity, price, currencies) { return Order.of(Side.ask, quantity, price, currencies) }
-  static bid(quantity, price, currencies) { return Order.of(Side.bid, quantity, price, currencies) }
+  static ask(quantity, price, currencies) { return this.of(Side.ask, quantity, price, currencies) }
+  static bid(quantity, price, currencies) { return this.of(Side.bid, quantity, price, currencies) }
 
   constructor(map) { super(map) }
   get id() { return this.map.get('id') }

@@ -5,8 +5,9 @@ import assert from 'assert'
  * gateway methods are external async calls
  */
  export default class ExchangeGateway {
-  constructor(exceptionHandler) {
+  constructor(name, exceptionHandler) {
     assert(!!exceptionHandler, 'a gateway must be configured with an exception handler')
+    this.name = name
     this.exceptionHandler = exceptionHandler
   }
 

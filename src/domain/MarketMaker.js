@@ -1,43 +1,70 @@
 import {Maps} from '../common/van_diagrams'
+import {notify} from '../common/globals'
+import Currency from './Currency'
 import Order from './Order'
 import OrderBook, {ordersToMap} from './OrderBook'
 
 
 /**
- * I maintain a spread of ask & bid order to keep the market "happening" i n an exchange
- * as trading events happen, I adjust positions using a spread strategy
+ * I maintain a spread of ask & bid order to keep the market "happening" in an exchange.
+ * as trading events happen, I adjust positions using a spread strategy.
  */
 export default class MarketMaker {
-  static async of(exchange, strategy, currencies) {
-    const orders = await exchange.getCurrentOrdersFor(currencies)
-    const book = OrderBook.of(currencies, orders)
+  static of(exchange, strategy, book) {
     return new MarketMaker(exchange, strategy, book)
   }
 
   constructor(exchange, strategy, book) {
     this.exchange = exchange
     this.strategy = strategy
-    this._book = book
+    this.book = book
   }
-  get book() { return this._book }
+  get currencies() {
+    const map = this.book.currencies
+    return Currency.pairOf(map.getIn(['primary', 'symbol']), map.getIn(['secondary', 'symbol']))
+  }
+
+  /** synchronize with exchange's current positions.
+   * this is needed whenever the MarketMaker comes alive,
+   * or if orders have placed on behalf of MarketMaker by other means.
+   */
+  async synchronized() {
+    const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
+    const bookFromExchange = OrderBook.of(this.currencies, ordersFromExchange)
+          //fixme: compare local book with bookFromExchange and report discrepancies
+    return MarketMaker.of(this.exchange, this.strategy, bookFromExchange)
+  }
 
   /** on notification of a trade (of an existing order):
    * 1. offset the book with the newly traded order
    * 2. if the order is filled, recalibrate the book using the spread strategy
    */
-  async onTrade(order) {
-    if (this.book.hasOrder(order.id)) {
-      this._book = this.book.offset(order)
-      if (order.isFulfilled) await (true ? this._recalibrate_1() : this._recalibrate_2()) //fixme: which to use?
+  async respondTo(trade) {
+    const existingOrder = this.book.getOrder(trade.id)
+    if (!!existingOrder && existingOrder.isRelatedTo(trade)) {
+
+      if(false) { //fixme: we might want to do the offsetting here ourselves
+        const book = trade.isFulfilled ?
+          this.book.remove(existingOrder) :
+          this.book.merge(trade)
+        return book
+      }
+      else { // the current method ... need to work on it ...
+        this.book = this.book.offset(trade)
+        if (trade.isFulfilled) await (true ? this._recalibrate_1() : this._recalibrate_2()) //fixme: which to use?
+      }
+    } else {
+      notify(`Houston, we have a problem:\nthe trade ${trade} does not relate to any order on our book`)
     }
+    return this.book
   }
 
   // async _recalibrate_1() {
   //   Promise.all(this.book.orders.map(each => this.exchange.cancel(each)))
-  //   const price = this.exchange.getLastExchangeRateFor(this.book.currencies) //fixme: or fulfilled order.price ?
-  //   const newPositions = this.strategy.generateOrdersFor(price, this.book.currencies)
-  //   this._book = await Promise.all(newPositions.map(each => this.exchange.place(each))).
-  //     then(placed => OrderBook.of(this.book.currencies, placed))
+  //   const price = this.exchange.getLastExchangeRateFor(this.currencies) //fixme: or fulfilled order.price ?
+  //   const newPositions = this.strategy.generateOrdersFor(price, this.currencies)
+  //   this.book = await Promise.all(newPositions.map(each => this.exchange.place(each))).
+  //     then(placed => OrderBook.of(this.currencies, placed))
   // }
   /**
   * recalibrating the book logic:
@@ -47,10 +74,10 @@ export default class MarketMaker {
   */
   async _recalibrate_1() {
     const cancelCurrentPositions = () => Promise.all(this.book.orders.map(each => this.exchange.cancel(each)))
-    const getLastExchangeRate = () => this.exchange.getLastExchangeRateFor(this.book.currencies)
-    const generateNewPositions = (price) => Promise.resolve(this.strategy.generateOrdersFor(price, this.book.currencies))
+    const getLastExchangeRate = () => this.exchange.getLastExchangeRateFor(this.currencies)
+    const generateNewPositions = (price) => Promise.resolve(this.strategy.generateOrdersFor(price, this.currencies))
     const placeNewPositions = (newPositions) => Promise.all(newPositions.map(each => this.exchange.place(each)))
-    this._book = await cancelCurrentPositions().
+    this.book = await cancelCurrentPositions().
       then(cancelled => getLastExchangeRate().
         then(price => generateNewPositions(price)).
         then(newPositions => placeNewPositions(newPositions)))
@@ -65,9 +92,9 @@ export default class MarketMaker {
    *  5. move the book to future positions (kept + placed)
    */
   async _recalibrate_2() {
-    const price = await this.exchange.getLastExchangeRateFor(this.book.currencies)
+    const price = await this.exchange.getLastExchangeRateFor(this.currencies)
     const current = this.book.order
-    const future = this.strategy.generateOrdersFor(price, this.book.currencies)
+    const future = this.strategy.generateOrdersFor(price, this.currencies)
     const {toCancel, toKeep, toPlace} = this.groupByCancelKeepPlace(current, future)
 
     const cancelled = await Promise.all(toCancel.map(each => this.exchange.cancel(each)))
@@ -75,7 +102,7 @@ export default class MarketMaker {
       console.log(`failed to cancel at least one of ${toCancel.join('\n')}`) //fixme: what should we do instead?
     }
     const placed = await Promise.all(toPlace.map(each => this.exchange.place(each)))
-    this._book = OrderBook.of(this.book.currencies, toKeep.merge(placed))
+    this.book = OrderBook.of(this.currencies, toKeep.merge(placed))
   }
 
   groupByCancelKeepPlace(currentOrders, futureOrders) {

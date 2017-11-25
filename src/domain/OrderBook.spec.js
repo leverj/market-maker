@@ -1,11 +1,11 @@
-import {lev2eth} from '../helpers/testing/fixtures'
+import * as fixtures from '../helpers/testing/fixtures'
 import {List} from 'immutable'
 import OrderBook from './OrderBook'
 import Order from './Order'
 
 
 describe('OrderBook', () => {
-  const currencies = lev2eth
+  const currencies = fixtures.currencies
   const quantity = 10, price = 110.0
   const now = new Date
   const orders = List.of(
@@ -18,9 +18,6 @@ describe('OrderBook', () => {
 
   describe('construction', () => {
     it('orders are represented as Map of Maps', () => {
-      /*
-       Map { "currencies": Map { "primary": Map { "symbol": "LEV" }, "secondary": Map { "symbol": "ETH" }, "code": "LEVETH" }, "orders": Map { "id_1": Map { "id": "id_1", "timestamp": Fri Nov 24 2017 02:28:09 GMT-0800 (PST), "currencies": Map { "primary": Map { "symbol": "LEV" }, "secondary": Map { "symbol": "ETH" }, "code": "LEVETH" }, "side": "Ask", "price": 115, "quantity": 10, "remaining": 10 }, "id_2": Map { "id": "id_2", "timestamp": Fri Nov 24 2017 02:28:09 GMT-0800 (PST), "currencies": Map { "primary": Map { "symbol": "LEV" }, "secondary": Map { "symbol": "ETH" }, "code": "LEVETH" }, "side": "Ask", "price": 111, "quantity": 10, "remaining": 10 }, "id_3": Map { "id": "id_3", "timestamp": Fri Nov 24 2017 02:28:09 GMT-0800 (PST), "currencies": Map { "primary": Map { "symbol": "LEV" }, "secondary": Map { "symbol": "ETH" }, "code": "LEVETH" }, "side": "Bid", "price": 109, "quantity": 10, "remaining": 10 }, "id_4": Map { "id": "id_4", "timestamp": Fri Nov 24 2017 02:28:09 GMT-0800 (PST), "currencies": Map { "primary": Map { "symbol": "LEV" }, "secondary": Map { "symbol": "ETH" }, "code": "LEVETH" }, "side": "Bid", "price": 105, "quantity": 10, "remaining": 10 } } }
-       */
       expect(book.toJS()).toEqual(      {
         currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
         orders: {
@@ -66,7 +63,7 @@ describe('OrderBook', () => {
 
     it('a book can contain only placed orders', () => {
       expect(book.size).toBe(orders.size)
-      orders.forEach(each => expect(book.hasOrder(each.id)))
+      orders.forEach(each => expect(book.hasOrder(each.id)).toBe(true))
 
       expect(() => { OrderBook.of(currencies, orders.push(Order.ask(quantity, price, currencies))) }).
         toThrow(/orders within a book must first be placed \(have an id\)/)
@@ -79,19 +76,19 @@ describe('OrderBook', () => {
       expect(!before.hasOrder('id_new'))
 
       const toBeAdded = Order.ask(quantity, price, currencies).placeWith('id_new')
-      const after = before.usurp(toBeAdded)
-      expect(after.hasOrder('id_new'))
+      const after = before.mergeWith(toBeAdded)
+      expect(after.hasOrder('id_new')).toBe(true)
       expect(after.getOrder('id_new')).toEqual(toBeAdded)
       expect(after.size).toBe(before.size + 1)
     })
 
-    it('can remove an order', () => {
+    it('can without an order', () => {
       const before = book
       expect(before.hasOrder('id_1'))
 
       const toBeRemoved = before.getOrder('id_1')
-      const after = before.remove(toBeRemoved)
-      expect(!after.hasOrder('id_1'))
+      const after = before.without(toBeRemoved)
+      expect(after.hasOrder('id_1')).toBe(false)
       expect(after.size).toBe(before.size - 1)
     })
 
@@ -100,8 +97,8 @@ describe('OrderBook', () => {
       expect(before.hasOrder('id_1'))
 
       const toBeUpdated = decrement(before.getOrder('id_1'), 1)
-      const after = before.usurp(toBeUpdated)
-      expect(after.hasOrder('id_1'))
+      const after = before.mergeWith(toBeUpdated)
+      expect(after.hasOrder('id_1')).toBe(true)
       const updated = after.getOrder('id_1')
       expect(updated.quantity).toBe(toBeUpdated.quantity)
       expect(updated.remaining).toBe(toBeUpdated.remaining)
@@ -126,24 +123,24 @@ describe('OrderBook', () => {
       const before = book
       const existing = before.getOrder(id)
       const partial = decrement(existing, 1)
-      expect(!partial.isFulfilled)
+      expect(partial.isFulfilled).toBe(false)
 
       const after = before.offset(partial)
-      expect(after.hasOrder(id))
+      expect(after.hasOrder(id)).toBe(true)
       expect(after.size).toBe(before.size)
-      expect(!after.getOrder(id).isFulfilled)
+      expect(after.getOrder(id).isFulfilled).toBe(false)
       expect(after.getOrder(id).remaining).toBe(9)
     })
 
-    it('should offset and remove an order if it is filled', () => {
+    it('should offset and without an order if it is filled', () => {
       const id = 'id_1'
       const before = book
       const existing = before.getOrder(id)
       const filled = decrement(existing, existing.remaining)
-      expect(filled.isFulfilled)
+      expect(filled.isFulfilled).toBe(true)
 
       const after = before.offset(filled)
-      expect(!after.hasOrder(id))
+      expect(after.hasOrder(id)).toBe(false)
       expect(after.size).toBe(before.size - 1)
     })
   })

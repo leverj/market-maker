@@ -1,10 +1,10 @@
-import {lev2eth} from '../helpers/testing/fixtures'
+import * as fixtures from '../helpers/testing/fixtures'
 import Order from './Order'
 import Currency from './Currency'
 
 
 describe('Order', () => {
-  const currencies = lev2eth
+  const currencies = fixtures.currencies
   const quantity = 10, price = 10.50
   const order = Order.ask(quantity, price, currencies)
 
@@ -12,9 +12,9 @@ describe('Order', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
       expect(order.id).toBeUndefined()
       expect(order.timeStamp).toBeUndefined()
-      expect(order.isAsk)
-      expect(!order.isBid)
-      expect(!order.isPlaced)
+      expect(order.isAsk).toBe(true)
+      expect(order.isBid).toBe(false)
+      expect(order.isPlaced).toBe(false)
       expect(order.toJS()).toEqual({
         id: undefined,
         timestamp: undefined,
@@ -38,21 +38,21 @@ describe('Order', () => {
 
     it('an order is placed by assigning id', () => {
       const placedOrder = order.placeWith('test-id')
-      expect(!order.isPlaced)
-      expect(placedOrder.isPlaced)
+      expect(order.isPlaced).toBe(false)
+      expect(placedOrder.isPlaced).toBe(true)
     })
   })
 
   describe('isRelatedTo', () => {
     it('should discern if orders are related (primary requirement when filling an order)', () => {
-      expect(order.isRelatedTo(Order.ask(quantity, price, currencies)))
-      expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies)))
-      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.LEV(), Currency.ETH()))))
+      expect(order.isRelatedTo(Order.ask(quantity, price, currencies))).toBe(true)
+      expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies))).toBe(true)
+      expect(order.isRelatedTo(Order.ask(quantity, price, fixtures.currencies))).toBe(true)
 
-      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.of('whatever'), Currency.ETH()))))
-      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.LEV(), Currency.of('whatever')))))
-      expect(!order.isRelatedTo(Order.ask(quantity, price + 1.00, currencies)))
-      expect(!order.isRelatedTo(Order.bid(quantity, price, currencies)))
+      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('whatever', 'ETH')))).toBe(false)
+      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('LEV', 'whatever')))).toBe(false)
+      expect(order.isRelatedTo(Order.ask(quantity, price + 1.00, currencies))).toBe(false)
+      expect(order.isRelatedTo(Order.bid(quantity, price, currencies))).toBe(false)
     })
   })
 

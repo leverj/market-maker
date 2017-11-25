@@ -1,2 +1,1 @@
-# market-maker
-market maker for LEV via Getcoin
+checkout design.md for the intended functionality 

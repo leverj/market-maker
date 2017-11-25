@@ -12,14 +12,10 @@ export default class SpreadStrategy {
 class FixedSpread extends SpreadStrategy {
   constructor(depth, quantity, step) {
     super()
-    this._depth = depth
-    this._quantity = quantity
-    this._step = step
+    this.depth = depth
+    this.quantity = quantity
+    this.step = step
   }
-
-  get depth() { return this._depth }
-  get quantity() { return this._quantity }
-  get step() { return this._step }
 
   generateOrdersFor(price, currencies) {
     return Range(1, this.depth + 1).flatMap(i =>

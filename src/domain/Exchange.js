@@ -1,10 +1,9 @@
 
 export default class Exchange {
-  constructor(name, gateway) {
-    this.name = name
+  constructor(gateway) {
     this.gateway = gateway
   }
-  toString() { return `${this.name} Exchange` }
+  toString() { return `${this.gateway.name} Exchange` }
 
   async getCurrentOrdersFor(currencies) { return this.gateway.getCurrentOrdersFor(currencies) }
   async getLastExchangeRateFor(currencies) { return this.gateway.getLastExchangeRateFor(currencies) }
