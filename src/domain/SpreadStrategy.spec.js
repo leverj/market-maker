@@ -1,4 +1,4 @@
-import {lev2eth} from '../helpers/test_fixtures'
+import {lev2eth} from '../helpers/testing/fixtures'
 import {List} from 'immutable'
 import SpreadStrategy from './SpreadStrategy'
 

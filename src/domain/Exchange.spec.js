@@ -1,4 +1,4 @@
-import {lev2eth, newStubbedExchange} from '../helpers/test_fixtures'
+import {lev2eth, newStubbedExchange} from '../helpers/testing/fixtures'
 import Exchange from './Exchange'
 
 

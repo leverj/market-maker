@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import {StubbedGateway, lev2eth, newStubbedExchange} from '../helpers/test_fixtures'
+import {lev2eth, newStubbedExchange, StubbedGateway} from '../helpers/testing/fixtures'
 import Order from './Order'
 import OrderBook from './OrderBook'
 import SpreadStrategy from './SpreadStrategy'
@@ -12,8 +12,8 @@ describe('MarketMaker', () => {
 
   describe('on creation, retrieve pending orders in exchange', () => {
     it('if exchange has none, internal book should be empty', async () => {
-      const exchange = newStubbedExchange(StubbedGateway.from(currencies, List()))
-      const maker = await MarketMaker.from(exchange, strategy, currencies)
+      const exchange = newStubbedExchange(StubbedGateway.of(currencies, List()))
+      const maker = await MarketMaker.of(exchange, strategy, currencies)
       expect(maker.book).toEqual(exchange.gateway.book)
       expect(maker.book.size).toBe(0)
     })
@@ -25,8 +25,8 @@ describe('MarketMaker', () => {
         Order.ask(quantity, price + 1, currencies),
         Order.bid(quantity, price - 1, currencies),
       )
-      const exchange = newStubbedExchange(StubbedGateway.from(currencies, orders))
-      const maker = await MarketMaker.from(exchange, strategy, currencies)
+      const exchange = newStubbedExchange(StubbedGateway.of(currencies, orders))
+      const maker = await MarketMaker.of(exchange, strategy, currencies)
       expect(maker.book).toEqual(exchange.gateway.book)
       expect(maker.book.size).toBe(orders.size)
       expect(maker.book.asks.size).toBe(2)
@@ -34,8 +34,8 @@ describe('MarketMaker', () => {
     })
 
     // it('if starting with an empty book, recalibrate', () => {
-    //   const emptyBook = OrderBook.from(currencies, List())
-    //   MarketMaker.from(fixturesnewStubbedExchange(), strategy, emptyBook)
+    //   const emptyBook = OrderBook.of(currencies, List())
+    //   MarketMaker.of(fixturesnewStubbedExchange(), strategy, emptyBook)
     //   expect(book.size).toBeGreaterThen(0)
     // })
 /*

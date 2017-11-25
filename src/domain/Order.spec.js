@@ -1,4 +1,4 @@
-import {lev2eth} from '../helpers/test_fixtures'
+import {lev2eth} from '../helpers/testing/fixtures'
 import Order from './Order'
 import Currency from './Currency'
 
@@ -49,8 +49,8 @@ describe('Order', () => {
       expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies)))
       expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.LEV(), Currency.ETH()))))
 
-      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.from('whatever'), Currency.ETH()))))
-      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.LEV(), Currency.from('whatever')))))
+      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.of('whatever'), Currency.ETH()))))
+      expect(!order.isRelatedTo(Order.ask(quantity, price, Currency.pair(Currency.LEV(), Currency.of('whatever')))))
       expect(!order.isRelatedTo(Order.ask(quantity, price + 1.00, currencies)))
       expect(!order.isRelatedTo(Order.bid(quantity, price, currencies)))
     })

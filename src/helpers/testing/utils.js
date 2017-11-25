@@ -4,6 +4,8 @@ export const exceptionHandler = (e) => {
   throw e
 }
 
+export async function sleep(millis) { return new Promise(resolve => setTimeout(resolve, millis)) }
+
 export const print = (value) => {
   const prefix = '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
   const suffix = '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'

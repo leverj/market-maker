@@ -1,8 +1,14 @@
+import assert from 'assert'
+
 
 /**
  * gateway methods are external async calls
  */
  export default class ExchangeGateway {
+  constructor(exceptionHandler) {
+    assert(!!exceptionHandler, 'a gateway must be configured with an exception handler')
+    this.exceptionHandler = exceptionHandler
+  }
 
   /** returns a List of pending orders */
   async getCurrentOrdersFor(currencies) { throw new TypeError('Must override method') }

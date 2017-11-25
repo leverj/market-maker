@@ -1,4 +1,4 @@
-import {lev2eth} from '../helpers/test_fixtures'
+import {lev2eth} from '../helpers/testing/fixtures'
 import {List} from 'immutable'
 import OrderBook from './OrderBook'
 import Order from './Order'
@@ -14,7 +14,7 @@ describe('OrderBook', () => {
     Order.bid(quantity, price - 1, currencies).placeWith('id_3', now),
     Order.bid(quantity, price - 5, currencies).placeWith('id_4', now),
   )
-  const book = OrderBook.from(currencies, orders)
+  const book = OrderBook.of(currencies, orders)
 
   describe('construction', () => {
     it('orders are represented as Map of Maps', () => {
@@ -68,7 +68,7 @@ describe('OrderBook', () => {
       expect(book.size).toBe(orders.size)
       orders.forEach(each => expect(book.hasOrder(each.id)))
 
-      expect(() => { OrderBook.from(currencies, orders.push(Order.ask(quantity, price, currencies))) }).
+      expect(() => { OrderBook.of(currencies, orders.push(Order.ask(quantity, price, currencies))) }).
         toThrow(/orders within a book must first be placed \(have an id\)/)
     })
   })

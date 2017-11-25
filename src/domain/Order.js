@@ -1,13 +1,13 @@
 import assert from 'assert'
 import {Map} from 'immutable'
-import ImmutableObject from './ImmutableObject'
+import ImmutableObject from '../common/ImmutableObject'
 
 
 /** I start as an intention to trade on an exchange a quantity of a primary currency in terms of a secondary currency.
  * once I'm placed to be traded in an exchange I become part of an order book, until I am fulfilled (either sold or bought in full)
  */
 export default class Order extends ImmutableObject {
-  static from(side, quantity, price, currencies) {
+  static of(side, quantity, price, currencies) {
     assert(quantity > 0, `${quantity} : quantity must be positive`)
     assert(price > 0, `${price} : price must be positive`)
     return new Order(Map({
@@ -20,8 +20,8 @@ export default class Order extends ImmutableObject {
       remaining: quantity,
     }))
   }
-  static ask(quantity, price, currencies) { return Order.from(Side.ask, quantity, price, currencies) }
-  static bid(quantity, price, currencies) { return Order.from(Side.bid, quantity, price, currencies) }
+  static ask(quantity, price, currencies) { return Order.of(Side.ask, quantity, price, currencies) }
+  static bid(quantity, price, currencies) { return Order.of(Side.bid, quantity, price, currencies) }
 
   constructor(map) { super(map) }
   get id() { return this.map.get('id') }

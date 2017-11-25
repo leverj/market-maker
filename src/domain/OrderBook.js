@@ -1,6 +1,6 @@
 import assert from 'assert'
-import {List, Map} from 'immutable'
-import ImmutableObject from './ImmutableObject'
+import {Map} from 'immutable'
+import ImmutableObject from '../common/ImmutableObject'
 import Order from './Order'
 
 
@@ -8,12 +8,12 @@ import Order from './Order'
  * my orders are placed or cancelled by a MarketMaker
  */
 export default class OrderBook extends ImmutableObject {
-  static from(currencies, orders = List()) {
-    orders.forEach(each => assert(each.isPlaced, `orders within a book must first be placed (have an id)`))
-    return new OrderBook(Map({
-      currencies: currencies.map,
-      orders: Map(orders.map(each => [each.id, each.map])),
-    }))
+  static of(currencies, orders) {
+    orders.forEach(each => assert(each.isPlaced, 'orders within a book must first be placed (have an id)'))
+    return OrderBook.fromOrdersMap(currencies, ordersToMap(orders))
+  }
+  static fromOrdersMap(currencies, ordersMap) {
+    return new OrderBook(Map({currencies: currencies.map, orders: ordersMap}))
   }
 
   constructor(map) { super(map) }
@@ -39,4 +39,7 @@ export default class OrderBook extends ImmutableObject {
   remove(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
   usurp(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
 }
+
+
+export const ordersToMap = (orders) => Map(orders.map(each => [each.id, each.map]))
 

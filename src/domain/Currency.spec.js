@@ -7,7 +7,7 @@ describe('Currency', () => {
   describe('Currency construction', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
       expect(Currency.LEV().toJS()).toEqual({symbol: 'LEV'})
-      expect(Currency.from('whatever').toJS()).toEqual({symbol: 'whatever'})
+      expect(Currency.of('whatever').toJS()).toEqual({symbol: 'whatever'})
       expect(new Currency(Map({symbol: 'whatever'})).toJS()).toEqual({symbol: 'whatever'})
     })
   })

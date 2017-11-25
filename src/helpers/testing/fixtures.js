@@ -1,26 +1,27 @@
 import uuidv4 from 'uuid/v4'
 import {List} from 'immutable'
-import OrderBook from '../domain/OrderBook'
-import Currency from '../domain/Currency'
-import Exchange from '../domain/Exchange'
-import ExchangeGateway from '../gateways/ExchangeGateway'
+import OrderBook from '../../domain/OrderBook'
+import Currency from '../../domain/Currency'
+import Exchange from '../../domain/Exchange'
+import ExchangeGateway from '../../gateways/ExchangeGateway'
+import {exceptionHandler} from './utils'
 
 
 export const lev2eth = Currency.pair(Currency.LEV(), Currency.ETH())
 
-export const newStubbedExchange = (gateway = StubbedGateway.from(lev2eth)) => new Exchange('Playground', gateway)
+export const newStubbedExchange = (gateway = StubbedGateway.of(lev2eth)) => new Exchange('Playground', gateway)
 
 
 export class StubbedGateway extends ExchangeGateway {
-  static from(currencies,  orders = List(), exchangeRate = 0) {
-    const book = OrderBook.from(currencies)
-    const gateway = new StubbedGateway(book, exchangeRate)
+  static of(currencies,  orders = List(), exchangeRate = 0) {
+    const book = OrderBook.of(currencies, List())
+    const gateway = new StubbedGateway(book, exchangeRate, exceptionHandler)
     orders.forEach(each => gateway._place(each))
     return gateway
   }
 
-  constructor(book, exchangeRate) {
-    super()
+  constructor(book, exchangeRate, exceptionHandler) {
+    super(exceptionHandler)
     this.book = book
     this.exchangeRate = exchangeRate
   }

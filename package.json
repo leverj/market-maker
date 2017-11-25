@@ -28,7 +28,7 @@
     ]
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "./src/helpers/test_helper.js",
+    "setupTestFrameworkScriptFile": "./src/helpers/chai_immutable_help.js",
     "testMatch": [
       "**/?(*.)(spec|test).js?(x)"
     ]

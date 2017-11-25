@@ -5,7 +5,6 @@ import fetch from 'node-fetch'
 import ExchangeGateway from './ExchangeGateway'
 import Order, {Side} from '../domain/Order'
 
-
 fetchival.fetch = fetch
 const rest = fetchival
 
@@ -13,9 +12,8 @@ const rest = fetchival
 //fixme: configure time out for all Promises
 export default class Gatecoin extends ExchangeGateway {
   constructor(config, exceptionHandler) {
-    super()
+    super(exceptionHandler)
     this.config = config
-    this.exceptionHandler = exceptionHandler
     if (!this.isAlive()) console.log(`${apiUrl} api is offline :-(`)
   }
 
@@ -51,12 +49,15 @@ export default class Gatecoin extends ExchangeGateway {
       then((response) => validate(response) && List(response.orders).
         filter(each => each.code == currencies.code).
         map(each =>
-          Order.from(
-            (each.side == 1 ? Side.ask : Side.bid),
-            each.initialQuantity,
-            each.price,
-            currencies,
-            each.clOrderId))).
+          new Order(Map({
+            id: each.clOrderId,
+            timestamp: fromSecondsStringToDate(each.date),
+            currencies: currencies,
+            side: (each.side == 1 ? Side.ask : Side.bid),
+            price: each.price,
+            quantity: each.initialQuantity,
+            remaining: each.remainingQuantity,
+          })))).
       catch(this.exceptionHandler)
   }
 
@@ -100,3 +101,6 @@ const throwError = (response) => {
 }
 
 const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')
+
+const fromSecondsStringToDate = (seconds) => new Date(seconds * 1000)
+
