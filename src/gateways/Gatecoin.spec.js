@@ -1,4 +1,4 @@
-import {exceptionHandler, print} from '../helpers/testing/utils'
+import {exceptionHandler, print} from '../common/test_helpers/utils'
 import {sleep} from '../common/promises'
 import Currency from '../domain/Currency'
 import Order from '../domain/Order'

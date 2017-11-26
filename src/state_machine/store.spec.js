@@ -1,5 +1,5 @@
 import {fromJS, Map} from 'immutable'
-import * as fixtures from '../helpers/testing/fixtures'
+import * as fixtures from '../common/test_helpers/fixtures'
 import makeStore from './store'
 import {actionCreators} from './actions'
 

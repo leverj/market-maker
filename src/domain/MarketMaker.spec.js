@@ -1,6 +1,6 @@
 import {List} from 'immutable'
-import * as fixtures from '../helpers/testing/fixtures'
-import StubbedGateway from '../helpers/testing/StubbedGateway'
+import * as fixtures from '../common/test_helpers/fixtures'
+import StubbedGateway from '../common/test_helpers/StubbedGateway'
 import Order from './Order'
 import SpreadStrategy from './SpreadStrategy'
 import MarketMaker from './MarketMaker'

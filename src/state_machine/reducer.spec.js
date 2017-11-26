@@ -1,5 +1,5 @@
 import {fromJS, List, Map} from 'immutable'
-import * as fixtures from '../helpers/testing/fixtures'
+import * as fixtures from '../common/test_helpers/fixtures'
 import Order from '../domain/Order'
 import OrderBook from '../domain/OrderBook'
 import reducer from './reducer'

@@ -1,4 +1,4 @@
-import * as fixtures from '../helpers/testing/fixtures'
+import * as fixtures from '../common/test_helpers/fixtures'
 import Exchange from './Exchange'
 
 
