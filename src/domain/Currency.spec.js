@@ -29,6 +29,7 @@ describe('Currency', () => {
         secondary: {symbol: 'ETH'},
         code: 'LEVETH',
       })
+      expect(Currency.pairOf('LEV', 'ETH').toString()).toEqual('LEV->ETH')
     })
   })
 

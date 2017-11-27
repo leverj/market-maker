@@ -2,34 +2,32 @@ import PubNub from 'pubnub'
 
 
 export default class TradeSubscriber {
-  constructor(name, exceptionHandler, channels) {
+  constructor(name, channels, callback) {
     this.name = name
-    this.exceptionHandler = exceptionHandler
+    this.channels = channels
+    this.callback = callback
   }
+  toString() { return `[${this.name}] : ${this.channels}` }
 
   subscribe() { throw new TypeError('Must override method') }
-  unsubscribe() { throw new TypeError('Must override method') }
+
+  /** an opportunity to cleanup resources */
+  shutdown() {  /* by default, do nothing */ }
 }
 
-// const OrderBookData = (currencies) => `marketdepth.${currencies.code}`
-// const OrderData = (currencies) => `order.${currencies.code}`
-// const TradesData = (currencies) => `trade.${currencies.code}`
-// const Ticker24hData = (currencies) => `ticker_24h.${currencies.code}`
-// const HistTickerhData = (currencies) => `hist_ticker.${currencies.code}`
 
 export class GatecoinPubNubSubscriber extends TradeSubscriber {
-  constructor(name, exceptionHandler, config, currencies) {
-    super(name, exceptionHandler)
+  constructor(name, channels, callback, config) {
+    super(name, channels, callback)
     this.pubnub = new PubNub({ subscribeKey: config.subscribeKey })
-    this.channels = [`trade.${currencies.code}`]
-    subscribe()
+    this.subscribe()
   }
 
   subscribe() {
     this.pubnub.subscribe({channels: this.channels})
     this.listener = this.pubnub.addListener({
       message: function (message) {
-        //fixme: do your thing
+        //fixme: do your thing using the callback
       }
     })
   }
@@ -39,11 +37,35 @@ export class GatecoinPubNubSubscriber extends TradeSubscriber {
     this.pubnub.unsubscribe({channels: this.channels})
   }
 
+  verifyConnection() {
+    pubnub.time(function(status, response) {
+      if (status.error) {
+        // handle error if something went wrong based on the status object
+      } else console.log(`${response.timetoken} - connection verified: ${this}` )
+    })
+  }
+
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/******** CHANNEL KINDS ********/
+
+
+const OrderBookData = (currencies) => `marketdepth.${currencies.code}`
+const OrderData = (currencies) => `order.${currencies.code}`
+const TradesData = (currencies) => `trade.${currencies.code}`
+const Ticker24hData = (currencies) => `ticker_24h.${currencies.code}`
+const HistTickerhData = (currencies) => `hist_ticker.${currencies.code}`
+
+//[`trade.${currencies.code}`]
+
+
+
 /******** ADDING LISTENERS ********/
+
+const pubnub = new PubNub({ subscribeKey: '' })
 
 pubnub.addListener({
   message: function(m) {
@@ -76,7 +98,7 @@ pubnub.addListener({
     var subscribedChannels = s.subscribedChannels; // All the current subscribed channels, of type array.
     var affectedChannelGroups = s.affectedChannelGroups; // The channel groups affected in the operation, of type array.
     var lastTimetoken = s.lastTimetoken; // The last timetoken used in the subscribe request, of type long.
-    var currentTimetoken = s.currentTimetoken; // The current timetoken fetched in the subscribe response, which is going to be used in the next request, of type long.
+    var currentTimetoken = s.currentTimetoken; // The current timetoken fetched in the subscribe response, which is going to be used in the nextTrade request, of type long.
   }
 });
 
@@ -96,18 +118,4 @@ pubnub.addListener({
    PNDecryptionErrorCategory -> If using decryption strategies and the decryption fails.
    PNTimeoutCategory -> Failure to establish connection due to timeout.
  */
-
-
-
-/******** TIME ********/
-
-// Call time() to verify the client connectivity to the origin:
-
-pubnub.time(function(status, response) {
-  if (status.error) {
-    // handle error if something went wrong based on the status object
-  } else {
-    console.log(response.timetoken);
-  }
-})
 

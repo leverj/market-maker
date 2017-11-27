@@ -11,7 +11,7 @@ describe('Order', () => {
   describe('construction', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
       expect(order.id).toBeUndefined()
-      expect(order.timeStamp).toBeUndefined()
+      expect(order.timestamp).toBeUndefined()
       expect(order.isAsk).toBe(true)
       expect(order.isBid).toBe(false)
       expect(order.isPlaced).toBe(false)
@@ -28,6 +28,34 @@ describe('Order', () => {
           code: 'LEVETH'
         }
       })
+    })
+
+    it('placed order criteria', () => {
+      expect(order.quantity).toBe(10)
+
+      const placed = order.placeWith('id_1')
+      expect(placed.id).toBeDefined()
+      expect(placed.timestamp).toBeTruthy()
+      expect(placed.isPlaced).toBe(true)
+      expect(placed.isNew).toBe(true)
+      expect(placed.isPartial).toBe(false)
+      expect(placed.isFulfilled).toBe(false)
+
+      const partial = placed._less_(1)
+      expect(partial.id).toBeDefined()
+      expect(partial.timestamp).toBeDefined()
+      expect(partial.isPlaced).toBe(true)
+      expect(partial.isNew).toBe(false)
+      expect(partial.isPartial).toBe(true)
+      expect(partial.isFulfilled).toBe(false)
+
+      const fulfilled = placed._less_(order.quantity)
+      expect(fulfilled.id).toBeDefined()
+      expect(fulfilled.timestamp).toBeDefined()
+      expect(fulfilled.isPlaced).toBe(true)
+      expect(fulfilled.isNew).toBe(false)
+      expect(fulfilled.isPartial).toBe(false)
+      expect(fulfilled.isFulfilled).toBe(true)
     })
 
     it('an order should have valid quantity & price', () => {

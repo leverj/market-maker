@@ -35,7 +35,7 @@ class CurrencyPair extends ImmutableObject {
   get primary() { return this.get('primary') }
   get secondary() { return this.get('secondary') }
   get code() { return this.get('code') }
-  toString() { return `${this.primary}->${this.secondary}` }
+  toString() { return `${this.getIn(['primary', 'symbol'])}->${this.getIn(['secondary', 'symbol'])}` }
 }
 /* private storage for memoized pairs */
 const pairs = Map().asMutable()

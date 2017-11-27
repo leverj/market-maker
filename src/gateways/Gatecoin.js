@@ -14,7 +14,7 @@ export default class Gatecoin extends ExchangeGateway {
   constructor(config, exceptionHandler) {
     super("Gatecoin", exceptionHandler)
     this.config = config
-    if (!this.isAlive()) console.log(`${apiUrl} api is offline :-(`)
+    if (!this.isUp()) console.log(`${apiUrl} api is offline :-(`)
   }
 
   options(method, url) {
@@ -34,7 +34,7 @@ export default class Gatecoin extends ExchangeGateway {
     }
   }
 
-  isAlive() {
+  isUp() {
     const endpoint = '/Ping'
     const url = `${this.config.apiUrl}${endpoint}?message=pong`
     return rest(url, this.options('POST', url)).post().

@@ -1,8 +1,9 @@
 import uuidv4 from 'uuid/v4'
 import {List} from 'immutable'
-import ExchangeGateway from '../../gateways/ExchangeGateway'
 import {exceptionHandler} from './utils'
 import * as fixtures from './fixtures'
+import ExchangeGateway from '../../gateways/ExchangeGateway'
+import TradeSubscriber from '../../gateways/TradeSubscriber'
 
 
 export default class StubbedGateway extends ExchangeGateway {
@@ -26,7 +27,21 @@ export default class StubbedGateway extends ExchangeGateway {
   }
 
   async cancel(order) {
-    this.book = this.book.remove(order)
+    this.book = this.book.without(order)
     return Promise.resolve(true)
   }
+}
+
+
+class StubbedTradeSubscriber extends TradeSubscriber {
+  constructor(name, channels, callback) {
+    super(name, channels, callback)
+    this.subscribe()
+  }
+
+  subscribe() {
+    //fixme: register a message callback
+    this.listener = null
+  }
+
 }

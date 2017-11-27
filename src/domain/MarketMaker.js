@@ -3,28 +3,29 @@ import {notify} from '../common/globals'
 import Currency from './Currency'
 import Order from './Order'
 import OrderBook, {ordersToMap} from './OrderBook'
+import {exceptionHandler, print} from '../common/test_helpers/utils'
 
 
 /**
- * I maintain a spread of ask & bid order to keep the market "happening" in an exchange.
+ * I maintain a spread of ask & bid order to keep the market "happening" in an newExchange.
  * as trading events happen, I adjust positions using a spread strategy.
  */
 export default class MarketMaker {
   static of(exchange, strategy, book) {
-    return new MarketMaker(exchange, strategy, book)
+    const currencies =  Currency.pairOf(
+      book.currencies.getIn(['primary', 'symbol']),
+      book.currencies.getIn(['secondary', 'symbol']))
+    return new MarketMaker(exchange, strategy, currencies, book)
   }
 
-  constructor(exchange, strategy, book) {
+  constructor(exchange, strategy, currencies, book) {
     this.exchange = exchange
     this.strategy = strategy
+    this.currencies = currencies
     this.book = book
   }
-  get currencies() {
-    const map = this.book.currencies
-    return Currency.pairOf(map.getIn(['primary', 'symbol']), map.getIn(['secondary', 'symbol']))
-  }
 
-  /** synchronize with exchange's current positions.
+  /** synchronizeWithExchange with newExchange's current positions.
    * this is needed whenever the MarketMaker comes alive,
    * or if orders have placed on behalf of MarketMaker by other means.
    */
@@ -59,28 +60,30 @@ export default class MarketMaker {
     return this.book
   }
 
-  // async _recalibrate_1() {
-  //   Promise.all(this.book.orders.map(each => this.exchange.cancel(each)))
-  //   const price = this.exchange.getLastExchangeRateFor(this.currencies) //fixme: or fulfilled order.price ?
-  //   const newPositions = this.strategy.generateOrdersFor(price, this.currencies)
-  //   this.book = await Promise.all(newPositions.map(each => this.exchange.place(each))).
-  //     then(placed => OrderBook.of(this.currencies, placed))
-  // }
   /**
   * recalibrating the book logic:
   *  1. cancel all current positions
   *  2. compute new positions given spread strategy & last traded price
   *  3. place orders for new positions
   */
+  // async _recalibrate_1() {
+  //   const cancelCurrentPositions = () => Promise.all(this.book.orders.map(each => this.newExchange.cancel(each)))
+  //   const getLastExchangeRate = () => this.newExchange.getLastExchangeRateFor(this.currencies)
+  //   const generateNewPositions = (price) => Promise.resolve(this.strategy.generateOrdersFor(price, this.currencies))
+  //   const placeNewPositions = (newPositions) => Promise.all(newPositions.map(each => this.newExchange.place(each)))
+  //   this.book = cancelCurrentPositions().
+  //     then(cancelled => getLastExchangeRate().
+  //       then(price => generateNewPositions(price)).
+  //       then(newPositions => placeNewPositions(newPositions)))
+  // }
   async _recalibrate_1() {
-    const cancelCurrentPositions = () => Promise.all(this.book.orders.map(each => this.exchange.cancel(each)))
-    const getLastExchangeRate = () => this.exchange.getLastExchangeRateFor(this.currencies)
-    const generateNewPositions = (price) => Promise.resolve(this.strategy.generateOrdersFor(price, this.currencies))
-    const placeNewPositions = (newPositions) => Promise.all(newPositions.map(each => this.exchange.place(each)))
-    this.book = await cancelCurrentPositions().
-      then(cancelled => getLastExchangeRate().
-        then(price => generateNewPositions(price)).
-        then(newPositions => placeNewPositions(newPositions)))
+    this.book = Promise.all(this.book.orders.map(each => this.exchange.cancel(each))).
+      then(cancelled => this.exchange.getLastExchangeRateFor(this.currencies)).
+      then(price => {
+        const newPositions = this.strategy.generateOrdersFor(price, this.currencies)
+        Promise.all(newPositions.map(each => this.exchange.place(each)))}).
+      then(placed => OrderBook.of(this.currencies, placed))
+    return this.book
   }
 
   /**

@@ -22,4 +22,7 @@ import assert from 'assert'
 
   /** returns a success criteria  */
   async cancel(order) { throw new TypeError('Must override method') }
+
+  /** an opportunity to cleanup resources */
+  shutdown() {  /* by default, do nothing */ }
 }

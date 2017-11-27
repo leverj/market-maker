@@ -9,8 +9,9 @@ import StubbedGateway from './StubbedGateway'
 
 export const currencies = Currency.pairOf('LEV', 'ETH')
 export const emptyBook = OrderBook.of(currencies)
-export const exchange = (gateway = new StubbedGateway()) => new Exchange(gateway)
+export const newExchange = (gateway = new StubbedGateway()) => new Exchange(gateway)
 export const spread = SpreadStrategy.fixed(3, 1, 0.1)
-export const marketMaker = async () => await MarketMaker.of(exchange, spread, currencies).synchronized()
+export const marketMaker = () => MarketMaker.of(newExchange(), spread, emptyBook)
+// export const marketMaker = async () => await MarketMaker.of(newExchange(), spread, emptyBook).synchronized()
 
 export const toBookMap = (book) => fromJS({ book: book.map })

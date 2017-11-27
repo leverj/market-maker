@@ -18,17 +18,17 @@ describe('MarketMaker', () => {
     Order.bid(10, price - 1, currencies),
   )
 
-  describe('on creation, retrieve pending orders in exchange', () => {
-    it('if exchange has none, internal book should be empty', () => {
-      const exchange = fixtures.exchange(new StubbedGateway())
+  describe('on creation, retrieve pending orders in newExchange', () => {
+    it('if newExchange has none, internal book should be empty', () => {
+      const exchange = fixtures.newExchange(new StubbedGateway())
       const marketMaker = MarketMaker.of(exchange, spread, fixtures.emptyBook)
       expect(marketMaker.book).toEqual(exchange.gateway.book)
       expect(marketMaker.book.size).toBe(0)
     })
 
-    it('if exchange has orders, internal book should have them too', async () => {
+    it('if newExchange has orders, internal book should have them too', async () => {
       const gateway = new StubbedGateway(orders)
-      const exchange = fixtures.exchange(gateway)
+      const exchange = fixtures.newExchange(gateway)
       const marketMaker = await MarketMaker.of(exchange, spread, fixtures.emptyBook).synchronized()
       expect(marketMaker.book).toEqual(exchange.gateway.book)
       expect(marketMaker.book.size).toBe(orders.size)
@@ -37,7 +37,7 @@ describe('MarketMaker', () => {
     })
 
     // it('if starting with an empty book, recalibrate', () => {
-    //   MarketMaker.of(fixtures.exchange(), spread, book)
+    //   MarketMaker.of(fixtures.newExchange(), spread, book)
     //   expect(book.size).toBeGreaterThen(0)
     // })
 /*

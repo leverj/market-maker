@@ -2,21 +2,22 @@ import OrderBook from '../domain/OrderBook'
 
 
 export const types = {
-  set: (book) => { return {type: 'SET', book: book} },
-  next: (marketMaker, trade) => { return {type: 'NEXT', marketMaker: marketMaker, trade: trade} },
-  synchronize: (marketMaker) => { return {type: 'SYNCHRONIZE', marketMaker: marketMaker} },
+  setBook: (book) => { return {type: 'SET_BOOK', book: book} },
+  nextTrade: (marketMaker, trade) => { return {type: 'NEXT_TRADE', marketMaker: marketMaker, trade: trade} },
+  synchronizeWithExchange: (marketMaker) => { return {type: 'SYNCHRONIZE_WITH_EXCHANGE', marketMaker: marketMaker} },
 }
 
 
 export const actions = {
-  set: (state, book) => state.set('book', book.map),
+  setBook: (state, book) => state.set('book', book.map),
 
-  next: (state, marketMaker, trade) => {
+  nextTrade: async (state, marketMaker, trade) => {
     const book = new OrderBook(state.get('book'))
-    return state.set('book', marketMaker.respondTo(trade, book).map)
+    const nextBook = await marketMaker.respondTo(trade, book)
+    return state.set('book', nextBook.map)
   },
 
-  synchronize: async (state, marketMaker) => {
+  synchronizeWithExchange: async (state, marketMaker) => {
     const book = await marketMaker.synchronized().book
     return state.set('book', book.map)
   }
