@@ -6,21 +6,11 @@ export const config = {
     }
   },
   gateways: {
-    Gatecoin_test: {
-      privateKey: '',
-      publicKey: '',
-      keysName: '',
-      keysExpiration: '',
-      permission: 'Trade Withdraw',
-      apiUrl: 'https://api.gtcprojects.com' // test
-    },
     Gatecoin: {
       privateKey: '',
       publicKey: '',
-      keysName: '',
-      keysExpiration: '',
-      permission: 'Trade Withdraw',
+      subscribeKey: '',
       apiUrl: 'https://api.gatecoin.com' // production
     },
-  }
+  },
 }

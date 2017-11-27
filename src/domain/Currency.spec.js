@@ -11,7 +11,7 @@ describe('Currency', () => {
       expect(new Currency(Map({symbol: 'whatever'})).toJS()).toEqual({symbol: 'whatever'})
     })
 
-    it('should lazyly actionCreators a currency if it does not exists', () => {
+    it('should lazyly types a currency if it does not exists', () => {
       const symbol = 'CRAP_'+ +new Date()
       expect(Currency.of(symbol).symbol).toEqual(symbol)
     })

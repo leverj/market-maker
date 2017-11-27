@@ -1,7 +1,11 @@
-import {fromJS, Map} from 'immutable'
-import * as fixtures from '../common/test_helpers/fixtures'
+import {List, Map} from 'immutable'
 import makeStore from './store'
-import {actionCreators} from './actions'
+import {types} from './actions'
+import * as fixtures from '../common/test_helpers/fixtures'
+import {toBookMap} from '../common/test_helpers/fixtures'
+import Order from '../domain/Order'
+import OrderBook from '../domain/OrderBook'
+
 
 describe('store', () => {
 
@@ -9,11 +13,15 @@ describe('store', () => {
     const store = makeStore()
     expect(store.getState()).toEqual(Map())
 
-    const book = fixtures.emptyBook
-    store.dispatch(actionCreators.set(book))
-    expect(store.getState()).toEqual(toState(book))
+    store.dispatch(types.set(fixtures.emptyBook))
+    expect(store.getState()).toEqual(toBookMap(fixtures.emptyBook))
+
+    const book = OrderBook.of(fixtures.currencies, List.of(
+      Order.ask(10, 11.75, fixtures.currencies).placeWith('id_1'),
+      Order.bid(20, 11.25, fixtures.currencies).placeWith('id_4'),
+    ))
+    store.dispatch(types.set(book))
+    expect(store.getState()).toEqual(toBookMap(book))
   })
 
 })
-
-const toState = (book) => fromJS({ book: book.map })
