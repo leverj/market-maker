@@ -1,11 +1,7 @@
 import {List, Map} from 'immutable'
 import SpreadStrategy from '../domain/SpreadStrategy'
 import OrderBook from '../domain/OrderBook'
-import Order from '../domain/Order'
-import MarketMaker from '../domain/MarketMaker'
-import reducer from './reducer'
-import {types} from './actions'
-import {currencies, emptyBook, newExchange, toBookMap} from '../common/test_helpers/fixtures'
+import {currencies, emptyBook, toBookMap} from '../common/test_helpers/fixtures'
 
 describe.skip('application logic', () => {
   const spread = SpreadStrategy.fixed(3, 2, 0.1)

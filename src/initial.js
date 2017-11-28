@@ -8,7 +8,8 @@ import Gatecoin from './gateways/Gatecoin'
 import {config} from './config'
 
 
-export const emptyBook = OrderBook.of(Currency.pairOf('LEV', 'ETH'))
+const currencies = Currency.pairOf('LEV', 'ETH')
+export const emptyBook = OrderBook.of(currencies)
 
 export const makeMarketMaker = (book) => {
   const exceptionHandler = (e) => {
@@ -30,5 +31,5 @@ export const makeMarketMaker = (book) => {
   const gateway = chooseGateway(config.env, config.gateways)
   const exchange = new Exchange(gateway)
   const strategy = makeSpreadStrategy(config.strategies.fixed)
-  return MarketMaker.of(exchange, strategy, book)
+  return MarketMaker.of(exchange, strategy, currencies)
 }

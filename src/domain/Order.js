@@ -3,8 +3,8 @@ import {Map} from 'immutable'
 import ImmutableObject from '../common/ImmutableObject'
 
 
-/** I start as an intention to trade on an newExchange a quantity of a primary currency in terms of a secondary currency.
- * once I'm placed to be traded in an newExchange I become part of an order book, until I am fulfilled (either sold or bought in full)
+/** I start as an intention to trade on an exchange a quantity of a primary currency in terms of a secondary currency.
+ * once I'm placed to be traded in an exchange I become part of an order book, until I am fulfilled (either sold or bought in full)
  */
 export default class Order extends ImmutableObject {
   static of(side, quantity, price, currencies) {
@@ -40,7 +40,7 @@ export default class Order extends ImmutableObject {
   get isNew() { return this.quantity == this.remaining }
   get isFulfilled() { return this.remaining == 0 }
   get isPartial() { return !this.isNew && !this.isFulfilled }
-  toString() { return `[${this.id}] ${this.side} ${this.quantity} ${this.currencies.primary} @ ${this.price} ${this.currencies.secondary}` }
+  toString() { return `[${this.id}] ${this.side} ${this.quantity} ${this.currencies.primary} @ ${this.price} ${this.currencies.secondary} (${this.remaining} remaining)` }
 
   placeWith(id, timestamp = new Date /* UTC */) { return new Order(this.map.merge({id: id, timestamp: timestamp})) }
 

@@ -7,7 +7,7 @@ import Order from '../domain/Order'
 import OrderBook from '../domain/OrderBook'
 
 
-describe.skip('store', () => {
+describe('store', () => {
 
   it('is a Redux store configured with the correct reducer', () => {
     const store = makeStore()
@@ -18,7 +18,7 @@ describe.skip('store', () => {
 
     const book = OrderBook.of(fixtures.currencies, List.of(
       Order.ask(10, 11.75, fixtures.currencies).placeWith('id_1'),
-      Order.bid(20, 11.25, fixtures.currencies).placeWith('id_4'),
+      Order.bid(20, 11.25, fixtures.currencies).placeWith('id_2'),
     ))
     store.dispatch(types.setBook(book))
     expect(store.getState()).toEqual(toBookMap(book))

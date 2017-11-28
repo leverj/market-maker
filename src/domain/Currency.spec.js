@@ -1,5 +1,5 @@
-import {List, Map} from 'immutable'
-import Currency, {currencies} from './Currency'
+import {Map} from 'immutable'
+import Currency from './Currency'
 
 
 describe('Currency', () => {

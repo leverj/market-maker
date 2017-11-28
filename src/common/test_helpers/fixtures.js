@@ -11,7 +11,6 @@ export const currencies = Currency.pairOf('LEV', 'ETH')
 export const emptyBook = OrderBook.of(currencies)
 export const newExchange = (gateway = new StubbedGateway()) => new Exchange(gateway)
 export const spread = SpreadStrategy.fixed(3, 1, 0.1)
-export const marketMaker = () => MarketMaker.of(newExchange(), spread, emptyBook)
-// export const marketMaker = async () => await MarketMaker.of(newExchange(), spread, emptyBook).synchronized()
+export const newMarketMaker = () => MarketMaker.of(newExchange(), spread, currencies)
 
 export const toBookMap = (book) => fromJS({ book: book.map })

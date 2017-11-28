@@ -1,9 +1,15 @@
+import assert from 'assert'
 import {List, Range} from 'immutable'
 import Order from './Order'
 
 
 export default class SpreadStrategy {
-  static fixed(depth, quantity, step) { return new FixedSpread(depth, quantity, step) }
+  static fixed(depth, quantity, step) {
+    assert(depth >= 1, `${depth} : depth must be 1 or greater`)
+    assert(quantity > 0, `${quantity} : quantity must be 1 or greater`)
+    assert(step > 0, `${step} : step must be positive price increment`)
+    return new FixedSpread(depth, quantity, step)
+  }
 
   generateOrdersFor(price, currencies) { throw new TypeError('Must override method') }
 }

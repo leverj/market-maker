@@ -1,4 +1,5 @@
 import OrderBook from '../domain/OrderBook'
+import {print} from '../common/test_helpers/utils'
 
 
 export const types = {
@@ -9,18 +10,24 @@ export const types = {
 
 
 export const actions = {
-  setBook: (state, book) => state.set('book', book.map),
+  setBook: (state, book) => setBookInState(state, book),
 
   nextTrade: async (state, marketMaker, trade) => {
-    const book = new OrderBook(state.get('book'))
-    const nextBook = await marketMaker.respondTo(trade, book)
-    return state.set('book', nextBook.map)
+    const currentBook = getBookFromState(state)
+    const nextBook = await marketMaker.respondTo(trade, currentBook)
+    // print(trade.id)
+    // print(currentBook.map.getIn(['orders', trade.id, "remaining"]))
+    // // print(nextBook.map.getIn(['orders', trade.id, "remaining"]))
+    // print(nextBook)
+    return setBookInState(state, nextBook)
   },
 
   synchronizeWithExchange: async (state, marketMaker) => {
-    const book = await marketMaker.synchronized().book
-    return state.set('book', book.map)
+    const book = await marketMaker.synchronize()
+    return setBookInState(state, book)
   }
 }
+const getBookFromState = (state) => new OrderBook(state.get('book'))
+const setBookInState = (state, book) => state.set('book', book.map)
 
 

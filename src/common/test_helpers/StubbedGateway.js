@@ -14,6 +14,7 @@ export default class StubbedGateway extends ExchangeGateway {
     orders.forEach(each => this.private_place(each))
   }
   setExchangeRate(value) { this.exchangeRate = value }
+  setBook(value) { this.book = value }
 
   async getCurrentOrdersFor(currencies) { return Promise.resolve(this.book.orders) }
 

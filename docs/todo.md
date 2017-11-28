@@ -5,7 +5,9 @@
 - timed-out gateway rest calls
 
 ## build
-- CircleCI integration
+- CircleCI integration 
+  - docker image
+  - .circle.... file
 - github build badges integration
 
 ## production
@@ -13,7 +15,10 @@
 - notification mechanism (can be incorporated via logging?)
 - proper exception handler
 - integrate a monitoring solution
+  - rancherOS
+  - ps2
+  - graphana + prometheus
 - npm `start` script not suitable for production
 - Gatecoin
   - production site keys
-  - trading account with money (ETH ?) in it
+  - trading account(2) with money (ETH ?) in it

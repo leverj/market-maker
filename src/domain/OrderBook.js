@@ -4,7 +4,7 @@ import ImmutableObject from '../common/ImmutableObject'
 import Order from './Order'
 
 
-/** I hold orders currently traded in an newExchange.
+/** I hold orders currently traded in an exchange.
  * my orders are placed or cancelled by a MarketMaker
  */
 export default class OrderBook extends ImmutableObject {

@@ -11,7 +11,7 @@ describe('Exchange', () => {
     expect(exchange.toString()).toEqual('Playground Exchange')
   })
 
-  it('should be able to get the latest newExchange rate', async () => {
+  it('should be able to get the latest exchange rate', async () => {
     const exchange = fixtures.newExchange()
     expect(await exchange.getLastExchangeRateFor(currencies)).toBe(0)
 
