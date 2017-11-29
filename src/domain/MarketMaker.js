@@ -2,6 +2,7 @@ import {Maps} from '../common/van_diagrams'
 import {notify} from '../common/globals'
 import Order from './Order'
 import OrderBook, {ordersToMap} from './OrderBook'
+import {actionTypes} from '../state_machine/actions'
 
 
 /**
@@ -9,11 +10,12 @@ import OrderBook, {ordersToMap} from './OrderBook'
  * as trading events happen, I adjust positions in a given book using a spread strategy.
  */
 export default class MarketMaker {
-  static of(exchange, strategy, currencies) {
-    return new MarketMaker(exchange, strategy, currencies)
+  static of(store, exchange, strategy, currencies) {
+    return new MarketMaker(store, exchange, strategy, currencies)
   }
 
-  constructor(exchange, strategy, currencies) {
+  constructor(store, exchange, strategy, currencies) {
+    this.store = store
     this.exchange = exchange
     this.strategy = strategy
     this.currencies = currencies
@@ -27,7 +29,7 @@ export default class MarketMaker {
     const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
     const fromExchange = OrderBook.of(this.currencies, ordersFromExchange)
     //fixme: compare local book with fromExchange and report discrepancies
-    return fromExchange
+    return this._viaStore_(fromExchange)
   }
 
   /** on notification of a trade (for an existing order):
@@ -42,7 +44,8 @@ export default class MarketMaker {
     }
 
     return Promise.resolve(book.offset(trade)).
-      then(result => trade.isFulfilled ? this._respread_(result) : result)
+      then(book => trade.isFulfilled ? this._respread_(book) : book).
+      then(book => this._viaStore_(book))
   }
 
   /**
@@ -89,6 +92,6 @@ export default class MarketMaker {
     }
   }
 
+  _viaStore_(book) { this.store.dispatch(actionTypes.setBook(book)); return book }
 }
-
 

@@ -1,6 +1,7 @@
 import {List} from 'immutable'
 import * as fixtures from '../common/test_helpers/fixtures'
 import StubbedGateway from '../common/test_helpers/StubbedGateway'
+import makeStore from '../state_machine/store'
 import Order from './Order'
 import SpreadStrategy from './SpreadStrategy'
 import MarketMaker from './MarketMaker'
@@ -21,7 +22,7 @@ describe('MarketMaker', () => {
     it('if the exchange has orders, marketMaker should be able to synchronize with them', async () => {
       const gateway = new StubbedGateway(orders)
       const exchange = fixtures.newExchange(gateway)
-      const marketMaker = MarketMaker.of(exchange, spread, currencies)
+      const marketMaker = MarketMaker.of(makeStore(), exchange, spread, currencies)
       const book = await marketMaker.synchronize()
       expect(book).toEqual(exchange.gateway.book)
       expect(book.size).toBe(orders.size)

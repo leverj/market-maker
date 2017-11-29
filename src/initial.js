@@ -1,4 +1,4 @@
-import OrderBook from './domain/OrderBook'
+import {exceptionHandler} from './common/globals'
 import Currency from './domain/Currency'
 import Exchange from './domain/Exchange'
 import SpreadStrategy from './domain/SpreadStrategy'
@@ -8,16 +8,8 @@ import Gatecoin from './gateways/Gatecoin'
 import {config} from './config'
 
 
-const currencies = Currency.pairOf('LEV', 'ETH')
-export const emptyBook = OrderBook.of(currencies)
+export const makeMarketMaker = (store) => {
 
-export const makeMarketMaker = (book) => {
-  const exceptionHandler = (e) => {
-    //fixme: we need real logging ...
-    console.log(`>>>>> ${e} <<<<<`)
-    //fixme: and either and swallowing or gracefully shutdown
-    //throw e
-  }
   const chooseGateway = (env, config) => {
     switch (env) {
       case 'dev': return new StubbedGateway()
@@ -31,5 +23,6 @@ export const makeMarketMaker = (book) => {
   const gateway = chooseGateway(config.env, config.gateways)
   const exchange = new Exchange(gateway)
   const strategy = makeSpreadStrategy(config.strategies.fixed)
-  return MarketMaker.of(exchange, strategy, currencies)
+  const currencies = Currency.pairOf('LEV', 'ETH')
+  return MarketMaker.of(store, exchange, strategy, currencies)
 }

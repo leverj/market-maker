@@ -2,7 +2,7 @@ import OrderBook from '../domain/OrderBook'
 import {print} from '../common/test_helpers/utils'
 
 
-export const types = {
+export const actionTypes = {
   setBook: (book) => { return {type: 'SET_BOOK', book: book} },
   nextTrade: (marketMaker, trade) => { return {type: 'NEXT_TRADE', marketMaker: marketMaker, trade: trade} },
   synchronizeWithExchange: (marketMaker) => { return {type: 'SYNCHRONIZE_WITH_EXCHANGE', marketMaker: marketMaker} },

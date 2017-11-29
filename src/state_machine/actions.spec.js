@@ -3,6 +3,7 @@ import SpreadStrategy from '../domain/SpreadStrategy'
 import OrderBook from '../domain/OrderBook'
 import {currencies, emptyBook, toBookMap} from '../common/test_helpers/fixtures'
 
+
 describe.skip('application logic', () => {
   const spread = SpreadStrategy.fixed(3, 2, 0.1)
   const price = 10.50
