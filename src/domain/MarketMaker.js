@@ -26,6 +26,7 @@ export default class MarketMaker {
    * or if orders have placed on behalf of MarketMaker by other means.
    */
   async synchronize() {
+    //fixme: how do we distinguish between 'our' orders and others? (validate that we only get ours from the exchange)
     const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
     const fromExchange = OrderBook.of(this.currencies, ordersFromExchange)
     //fixme: compare local book with fromExchange and report discrepancies
@@ -36,14 +37,14 @@ export default class MarketMaker {
    * 1. offset the book with the newly traded order
    * 2. if the order is filled, respread the book by applying the spread to it
    */
-  async respondTo(trade, book) {
-    const currentOrder = book.getOrder(trade.id)
+  async respondTo(trade, currentBook) {
+    const currentOrder = currentBook.getOrder(trade.id)
     if (!currentOrder || !currentOrder.isRelatedTo(trade)) {
       notify(`Houston, we have a problem:\nthe trade ${trade} does not relate to any order in the book`)
-      return book
+      return currentBook
     }
 
-    return Promise.resolve(book.offset(trade)).
+    return Promise.resolve(currentBook.offset(trade)).
       then(book => trade.isFulfilled ? this._respread_(book) : book).
       then(book => this._viaStore_(book))
   }

@@ -1,17 +1,17 @@
 ## stories
 - discrepancy report when MarketMaker is synchronized
 - gateway onTrade subscriber/notifier
-- functional MarketMaker
 - timed-out gateway rest calls
 
 ## build
 - CircleCI integration 
   - docker image
-  - .circle.... file
 - github build badges integration
+- discard babel if not needed 
 
 ## production
 - proper logging (into file, with levels)
+  - using something like: bunyan, winston
 - notification mechanism (can be incorporated via logging?)
 - proper exception handler
 - integrate a monitoring solution
