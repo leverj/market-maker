@@ -20,6 +20,12 @@ export const Sets = {
   }
 }
 
+export const Lists = {
+  vanDiagram(left, right) {
+    return Sets.vanDiagram(left.toSet(), right.toSet()).transform(each => each.toList())
+  }
+}
+
 export class VanDiagram extends ImmutableObject {
   static of(leftOnly, intersection, rightOnly) {
     return new VanDiagram(Map({
@@ -34,5 +40,5 @@ export class VanDiagram extends ImmutableObject {
   get intersection() { return this.get('intersection') }
   get rightOnly() { return this.get('rightOnly') }
 
-  flatMap(mapper) { return new VanDiagram(this.map.map(mapper)) }
+  transform(mapper) { return new VanDiagram(this.map.map(mapper)) }
 }

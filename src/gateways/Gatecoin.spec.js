@@ -1,3 +1,4 @@
+import {print} from '../common/globals'
 import {sleep} from '../common/promises'
 import Currency from '../domain/Currency'
 import Order from '../domain/Order'
@@ -11,7 +12,6 @@ import {config} from '../config'
  * !!!!! Be aware that running the tests wipes out all current trades for specifified <currencies> !!!!!
  * (we might want to change this)
  */
-// describe('Gatecoin api', () => {
 describe.skip('Gatecoin api', () => {
   const gateway = new Gatecoin(config.gateways.Gatecoin_test)
   const currencies = Currency.pairOf('BTC', 'USD')
@@ -50,7 +50,7 @@ describe.skip('Gatecoin api', () => {
   it(`should not cancel a non-existing order`, async () => {
     try {
       await gateway.cancel({id: 'no-such-order'})
-      fail("should throw")
+      fail('should throw')
     } catch(e) {
       expect(e.message).toMatch(/Order does not exist/)
     }

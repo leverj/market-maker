@@ -23,6 +23,8 @@ export default class Order extends ImmutableObject {
   static ask(quantity, price, currencies) { return this.of(Side.ask, quantity, price, currencies) }
   static bid(quantity, price, currencies) { return this.of(Side.bid, quantity, price, currencies) }
 
+  static toComparable(order) { return new ComparableOrder(order.map) }
+
   constructor(map) { super(map) }
   get id() { return this.map.get('id') }
   get timestamp() { return this.map.get('timestamp') }
@@ -31,6 +33,16 @@ export default class Order extends ImmutableObject {
   get price() { return this.map.get('price')}
   get quantity() { return this.map.get('quantity') }
   get remaining() { return this.map.get('remaining') }
+
+  isRelatedTo(that) { return this.isLike(that) && this.id == that.id }
+  isLike(that) {
+    return (
+      this.side == that.side &&
+      this.price == that.price &&
+      this.quantity == that.quantity &&
+      this.currencies.equals(that.currencies)
+    )
+  }
 
   get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
   get isBid() { return this.side == Side.bid}
@@ -46,18 +58,20 @@ export default class Order extends ImmutableObject {
 
   _less_(quantity) {
     assert(quantity <= this.remaining, `only ${this.remaining} remaining; ${this.remaining} is too large`)
-    return new Order(this.map.merge({remaining: this.remaining - quantity}))
+    return this._withRemaining_(this.remaining - quantity)
   }
-
-  isRelatedTo(that) {
-    return (
-      this.id == that.id &&
-      this.side == that.side &&
-      this.price == that.price &&
-      this.currencies.equals(that.currencies)
-    )
-  }
+  _withRemaining_(remaining) { return new Order(this.map.merge({remaining: remaining})) }
 
 }
 
 export const Side = {ask: 'Ask', bid: 'Bid'}
+
+
+class ComparableOrder extends Order {
+  constructor(map) { super(map) }
+
+  /* overriding (ValueObject) equality to compare using similarity */
+  hashCode() { return this.side.length * this.price * this.quantity * this.remaining * this.currencies.hashCode() }
+  equals(that) { return this.isSimilarTo(that) }
+  isSimilarTo(that) { return this.isLike(that) && this.remaining == that.remaining }
+}

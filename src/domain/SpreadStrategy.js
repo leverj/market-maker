@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {List, Range} from 'immutable'
 import Order from './Order'
+import {decimalPlaces, toDecimalPlaces} from '../common/numbers'
 
 
 export default class SpreadStrategy {
@@ -24,14 +25,12 @@ class FixedSpread extends SpreadStrategy {
   }
 
   generateOrdersFor(price, currencies) {
+    const precision = decimalPlaces(price)
     return Range(1, this.depth + 1).flatMap(i =>
       List.of(
-        Order.ask(this.quantity, price + (i * this.step), currencies),
-        Order.bid(this.quantity, price - (i * this.step), currencies)
+        Order.ask(this.quantity, toDecimalPlaces(price + (i * this.step), precision), currencies),
+        Order.bid(this.quantity, toDecimalPlaces(price - (i * this.step), precision), currencies)
       )
     ).toList()
   }
 }
-
-
-

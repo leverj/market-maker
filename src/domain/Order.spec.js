@@ -73,10 +73,12 @@ describe('Order', () => {
 
   describe('isRelatedTo', () => {
     it('should discern if orders are related (primary requirement when filling an order)', () => {
-      expect(order.isRelatedTo(Order.ask(quantity, price, currencies))).toBe(true)
-      expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies))).toBe(true)
+      expect(order.isRelatedTo(order.placeWith(order.id, new Date()))).toBe(true)
+      expect(order.isRelatedTo(order._less_(1))).toBe(true)
       expect(order.isRelatedTo(Order.ask(quantity, price, fixtures.currencies))).toBe(true)
 
+      expect(order.isRelatedTo(order.placeWith('whatever-id', order.timestamp))).toBe(false)
+      expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies))).toBe(false)
       expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('whatever', 'ETH')))).toBe(false)
       expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('LEV', 'whatever')))).toBe(false)
       expect(order.isRelatedTo(Order.ask(quantity, price + 1.00, currencies))).toBe(false)

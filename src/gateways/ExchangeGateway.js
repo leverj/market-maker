@@ -23,8 +23,23 @@ import {exceptionHandler} from '../common/globals'
   async cancel(order) { throw new TypeError('Must override method') }
 
   /** subscribe to onTrade notification using a callback */
-  registerOnTradeCallback(callback) { throw new TypeError('Must override method') }
+  subscribe(currencies, callback) { throw new TypeError('Must override method') }
 
   /** an opportunity to cleanup resources */
   shutdown() {  /* by default, do nothing */ }
 }
+
+
+export class TradeSubscriber {
+  constructor(name, channels, callback) {
+    this.name = name
+    this.channels = channels
+    this.callback = callback
+    this.exceptionHandler = exceptionHandler
+  }
+  toString() { return `[${this.name}] : ${this.channels}` }
+
+  /** an opportunity to cleanup resources */
+  shutdown() {  /* by default, do nothing */ }
+}
+

@@ -18,7 +18,8 @@ describe('OrderBook', () => {
 
   describe('construction', () => {
     it('orders are represented as Map of Maps', () => {
-      expect(book.toJS()).toEqual(      {
+      expect(book.toJS()).toEqual(
+      {
         currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
         orders: {
           'id_1': {
@@ -78,7 +79,7 @@ describe('OrderBook', () => {
       const toBeAdded = Order.ask(quantity, price, currencies).placeWith('id_new')
       const after = before.mergeWith(toBeAdded)
       expect(after.hasOrder('id_new')).toBe(true)
-      expect(after.getOrder('id_new')).toEqual(toBeAdded)
+      expect(after.getOrder('id_new').remaining).toEqual(toBeAdded.remaining)
       expect(after.size).toBe(before.size + 1)
     })
 

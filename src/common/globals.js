@@ -1,7 +1,7 @@
 
 export const notify = (message) => {
   //fixme: beside logging, we need to notify operations ...
-  console.log(message)
+  print(message)
 }
 
 export const exceptionHandler = (e) => {

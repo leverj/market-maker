@@ -12,7 +12,7 @@ const rest = fetchival
 //fixme: configure time out for all rest calls
 export default class Gatecoin extends ExchangeGateway {
   constructor(config) {
-    super("Gatecoin")
+    super('Gatecoin')
     this.config = config
     if (!this.isUp()) console.log(`${apiUrl} api is offline :-(`)
   }
@@ -90,10 +90,15 @@ export default class Gatecoin extends ExchangeGateway {
       then((response) => validate(response) && isOK(response)).
       catch(this.exceptionHandler)
   }
+
+  subscribe(currencies, callback) {
+    const channels = [`trade.${currencies.code}`]
+    this.substriber = new GatecoinPubNubSubscriber(`${this.name}.PubNub subscriber [${channels}` , channels, callback)
+  }
+
 }
 
 const validate = (response) => isOK(response) ? true : throwError(response)
-const check = (response) => isOK(response) ? response : throwError(response)
 const isOK = (response) => response.responseStatus.message == 'OK'
 const throwError = (response) => {
   const {errorCode, message} = response.responseStatus

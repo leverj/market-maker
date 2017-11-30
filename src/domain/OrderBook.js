@@ -37,7 +37,9 @@ export default class OrderBook extends ImmutableObject {
   }
 
   without(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
-  mergeWith(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
+  mergeWith(order) { return this.hasOrder(order.id) ?  this._modify_(order) : this._add_(order)}
+  _add_(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
+  _modify_(order) { return new OrderBook(this.map.setIn(['orders', order.id, 'remaining'], order.remaining)) }
 }
 
 

@@ -10,6 +10,6 @@ export default class Exchange {
   async place(order) { return this.gateway.place(order).then(id => order.placeWith(id, new Date)) }
   async cancel(order) { return this.gateway.cancel(order) }
 
-  registerOnTradeCallback(callback) { this.gateway.registerOnTradeCallback(callback) }
+  subscribe(currencies, callback) { this.gateway.subscribe(currencies, callback) }
 }
 

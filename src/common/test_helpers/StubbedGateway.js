@@ -1,8 +1,7 @@
 import uuidv4 from 'uuid/v4'
 import * as fixtures from './fixtures'
-import ExchangeGateway from '../../gateways/ExchangeGateway'
-import TradeSubscriber from '../../gateways/TradeSubscriber'
-import OrderBook from "../../domain/OrderBook"
+import ExchangeGateway, {TradeSubscriber} from '../../gateways/ExchangeGateway'
+import OrderBook from '../../domain/OrderBook'
 
 
 export default class StubbedGateway extends ExchangeGateway {
@@ -10,16 +9,18 @@ export default class StubbedGateway extends ExchangeGateway {
     super('Playground')
     this.book = OrderBook.of(currencies)
     this.exchangeRate = exchangeRate
-    const channels = [`trade.${currencies.code}`]
-    this.tradeSubstriber = new StubbedTradeSubscriber(this.name, channels, defaultCallback)
+    this.substriber = null /* subscriber is populated on subscribe(...) call */
   }
 
   setBook(value) { this.book = value }
 
   setExchangeRate(value) { this.exchangeRate = value }
 
-  setOnTradeCallback(callback) { this.tradeSubstriber.setOnTradeCallback(callback) }
-  triggerCallbackWith(trade) { this.tradeSubstriber.triggerCallbackWith(trade) }
+  subscribe(currencies, callback) {
+    const channels = [`trade.${currencies.code}`]
+    this.substriber = new StubbedSubscriber(`${this.name} subscriber` , channels, callback)
+  }
+  notifyOfTrade(trade) { this.substriber.callback(trade) }
 
   async getCurrentOrdersFor(currencies) { return Promise.resolve(this.book.orders) }
 
@@ -27,7 +28,7 @@ export default class StubbedGateway extends ExchangeGateway {
 
   async place(order) { return Promise.resolve(this._place_(order)) }
   _place_(order) {
-    const placed = order.placeWith(`id_${uuidv4()}`)
+    const placed = order.placeWith(`id_${uuidv4()}`, new Date())
     this.book = this.book.mergeWith(placed)
     return placed.id
   }
@@ -38,16 +39,9 @@ export default class StubbedGateway extends ExchangeGateway {
   }
 }
 
-const defaultCallback = (trade) => console.log(`simulating triggering respondTo(trade) with ${trade}`)
 
-
-export class StubbedTradeSubscriber extends TradeSubscriber {
+class StubbedSubscriber extends TradeSubscriber {
   constructor(name, channels, callback) {
     super(name, channels, callback)
   }
-
-  setOnTradeCallback(callback) { this.callback = callback }
-  triggerCallbackWith(trade) { this.callback(trade) }
-
-  subscribe() {  /* do nothing */ }
 }

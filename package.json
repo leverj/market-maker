@@ -34,17 +34,15 @@
     "babel-cli": "^6.26.0",
     "babel-preset-node8": "^1.2.0",
     "jest": "^21.2.1",
-    "jest-immutable-matchers": "^1.5.0",
-    "redux-devtools": "^3.4.1"
+    "jest-immutable-matchers": "^1.5.0"
   },
   "dependencies": {
     "bunyan": "^1.8.12",
     "crypto-js": "^3.1.9-1",
+    "decimal.js": "^7.4.0",
     "fetchival": "^0.3.3",
     "immutable": "^3.8.2",
     "node-fetch": "^1.7.3",
-    "pubnub": "^4.18.0",
-    "redux": "^3.7.2",
-    "socket.io": "^2.0.4"
+    "pubnub": "^4.18.0"
   }
 }

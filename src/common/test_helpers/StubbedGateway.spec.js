@@ -1,4 +1,5 @@
-import StubbedGateway, {StubbedTradeSubscriber} from './StubbedGateway'
+import * as fixtures from './fixtures'
+import StubbedGateway from './StubbedGateway'
 
 
 describe('simulating subscribe triggering onTrade callback', () => {
@@ -7,22 +8,10 @@ describe('simulating subscribe triggering onTrade callback', () => {
   describe('StubbedGateway', () => {
     it('should be able to set & trigger a callback', async () => {
       const gateway = new StubbedGateway()
-      gateway.setOnTradeCallback(onTrade)
+      gateway.subscribe(fixtures.currencies, onTrade)
       expect(tradingResult).toEqual('never called')
 
-      gateway.triggerCallbackWith('whatever')
-      expect(tradingResult).toEqual('doing the right thing with: whatever')
-    })
-
-  })
-
-  describe('StubbedTradeSubscriber', () => {
-    it('should be able to set & trigger a callback', async () => {
-      const subscriber = new StubbedTradeSubscriber()
-      subscriber.setOnTradeCallback(onTrade)
-      expect(tradingResult).toEqual('never called')
-
-      subscriber.triggerCallbackWith('whatever')
+      gateway.notifyOfTrade('whatever')
       expect(tradingResult).toEqual('doing the right thing with: whatever')
     })
 
