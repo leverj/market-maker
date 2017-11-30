@@ -5,6 +5,7 @@ import makeStore from '../state_machine/store'
 import Order from './Order'
 import SpreadStrategy from './SpreadStrategy'
 import MarketMaker from './MarketMaker'
+import OrderBook from "./OrderBook"
 
 
 describe('MarketMaker', () => {
@@ -16,11 +17,12 @@ describe('MarketMaker', () => {
     Order.ask(20, price + 5, currencies),
     Order.ask(10, price + 1, currencies),
     Order.bid(10, price - 1, currencies),
-  )
+  ).map((each, i) => each.placeWith(`id-${i}`))
 
   describe('on creation, retrieve pending orders in exchange', () => {
     it('if the exchange has orders, marketMaker should be able to synchronize with them', async () => {
-      const gateway = new StubbedGateway(orders)
+      const gateway = new StubbedGateway()
+      gateway.setBook(OrderBook.of(currencies, orders))
       const exchange = fixtures.newExchange(gateway)
       const marketMaker = MarketMaker.of(makeStore(), exchange, spread, currencies)
       const book = await marketMaker.synchronize()
