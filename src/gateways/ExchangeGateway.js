@@ -1,12 +1,11 @@
-import assert from 'assert'
+import {exceptionHandler} from '../common/globals'
 
 
 /**
  * gateway methods are external async calls
  */
  export default class ExchangeGateway {
-  constructor(name, exceptionHandler) {
-    assert(!!exceptionHandler, 'a gateway must be configured with an exception handler')
+  constructor(name) {
     this.name = name
     this.exceptionHandler = exceptionHandler
   }
@@ -22,6 +21,9 @@ import assert from 'assert'
 
   /** returns a success criteria  */
   async cancel(order) { throw new TypeError('Must override method') }
+
+  /** subscribe to onTrade notification using a callback */
+  registerOnTradeCallback(callback) { throw new TypeError('Must override method') }
 
   /** an opportunity to cleanup resources */
   shutdown() {  /* by default, do nothing */ }

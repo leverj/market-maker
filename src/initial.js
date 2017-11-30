@@ -8,7 +8,7 @@ import Gatecoin from './gateways/Gatecoin'
 import {config} from './config'
 
 
-export const makeMarketMaker = (store) => {
+export function makeMarketMaker() {
 
   const chooseGateway = (env, config) => {
     switch (env) {
@@ -18,11 +18,11 @@ export const makeMarketMaker = (store) => {
     }
     throw new Error(`unrecognized environment parameter: ${env}`)
   }
-  const makeSpreadStrategy = (config) => SpreadStrategy.fixed(config.depth, config.quantity, config.step)
 
   const gateway = chooseGateway(config.env, config.gateways)
   const exchange = new Exchange(gateway)
-  const strategy = makeSpreadStrategy(config.strategies.fixed)
+  const {depth, quantity, step} = config.strategies.fixed
+  const strategy = SpreadStrategy.fixed(depth, quantity, step)
   const currencies = Currency.pairOf('LEV', 'ETH')
-  return MarketMaker.of(store, exchange, strategy, currencies)
+  return MarketMaker.of(exchange, strategy, currencies)
 }

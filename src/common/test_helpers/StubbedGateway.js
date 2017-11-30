@@ -1,5 +1,4 @@
 import uuidv4 from 'uuid/v4'
-import {exceptionHandler} from './utils'
 import * as fixtures from './fixtures'
 import ExchangeGateway from '../../gateways/ExchangeGateway'
 import TradeSubscriber from '../../gateways/TradeSubscriber'
@@ -7,10 +6,10 @@ import OrderBook from "../../domain/OrderBook"
 
 
 export default class StubbedGateway extends ExchangeGateway {
-  constructor(currencies = fixtures.currencies) {
-    super('Playground', exceptionHandler)
+  constructor(exchangeRate = 0, currencies = fixtures.currencies) {
+    super('Playground')
     this.book = OrderBook.of(currencies)
-    this.exchangeRate = 0
+    this.exchangeRate = exchangeRate
     const channels = [`trade.${currencies.code}`]
     this.tradeSubstriber = new StubbedTradeSubscriber(this.name, channels, defaultCallback)
   }

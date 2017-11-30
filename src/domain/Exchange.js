@@ -9,5 +9,7 @@ export default class Exchange {
   async getLastExchangeRateFor(currencies) { return this.gateway.getLastExchangeRateFor(currencies) }
   async place(order) { return this.gateway.place(order).then(id => order.placeWith(id, new Date)) }
   async cancel(order) { return this.gateway.cancel(order) }
+
+  registerOnTradeCallback(callback) { this.gateway.registerOnTradeCallback(callback) }
 }
 

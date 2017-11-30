@@ -11,8 +11,8 @@ const rest = fetchival
 
 //fixme: configure time out for all rest calls
 export default class Gatecoin extends ExchangeGateway {
-  constructor(config, exceptionHandler) {
-    super("Gatecoin", exceptionHandler)
+  constructor(config) {
+    super("Gatecoin")
     this.config = config
     if (!this.isUp()) console.log(`${apiUrl} api is offline :-(`)
   }

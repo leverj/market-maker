@@ -1,4 +1,3 @@
-import {exceptionHandler, print} from '../common/test_helpers/utils'
 import {sleep} from '../common/promises'
 import Currency from '../domain/Currency'
 import Order from '../domain/Order'
@@ -14,8 +13,8 @@ import {config} from '../config'
  */
 // describe('Gatecoin api', () => {
 describe.skip('Gatecoin api', () => {
-  const gateway = new Gatecoin(config.gateways.Gatecoin_test, exceptionHandler)
-  const currencies = Currency.pair(Currency.of('BTC'), Currency.of('USD'))
+  const gateway = new Gatecoin(config.gateways.Gatecoin_test)
+  const currencies = Currency.pairOf('BTC', 'USD')
 
   it('api should be connected', async () => {
     expect(await gateway.isUp())

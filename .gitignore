@@ -4,6 +4,7 @@ package-lock.json
 lib/
 build/
 coverage/
+data/
 logs/
 *.log
 src/config.js
