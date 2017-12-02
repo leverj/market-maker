@@ -19,17 +19,12 @@ describe('Currency', () => {
 
   describe('CurrencyPair construction', () => {
     it('a new order has no id, and therefore is not placed yet', () => {
-      expect(Currency.pair(Currency.of('LEV'), Currency.of('ETH')).toJS()).toEqual({
+      expect(Currency.pair('LEV', 'ETH').toJS()).toEqual({
         primary: {symbol: 'LEV'},
         secondary: {symbol: 'ETH'},
         code: 'LEVETH',
       })
-      expect(Currency.pairOf('LEV', 'ETH').toJS()).toEqual({
-        primary: {symbol: 'LEV'},
-        secondary: {symbol: 'ETH'},
-        code: 'LEVETH',
-      })
-      expect(Currency.pairOf('LEV', 'ETH').toString()).toEqual('LEV->ETH')
+      expect(Currency.pair('LEV', 'ETH').toString()).toEqual('LEV->ETH')
     })
   })
 

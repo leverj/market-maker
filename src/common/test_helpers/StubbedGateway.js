@@ -17,7 +17,7 @@ export default class StubbedGateway extends ExchangeGateway {
   setExchangeRate(value) { this.exchangeRate = value }
 
   subscribe(currencies, callback) {
-    const channels = [`trade.${currencies.code}`]
+    const channels = [`order.${currencies.code}`]
     this.substriber = new StubbedSubscriber(`${this.name} subscriber` , channels, callback)
   }
   notifyOfTrade(trade) { this.substriber.callback(trade) }

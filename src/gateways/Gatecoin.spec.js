@@ -14,7 +14,7 @@ import {config} from '../config'
  */
 describe.skip('Gatecoin api', () => {
   const gateway = new Gatecoin(config.gateways.Gatecoin_test)
-  const currencies = Currency.pairOf('BTC', 'USD')
+  const currencies = Currency.pair('BTC', 'USD')
 
   it('api should be connected', async () => {
     expect(await gateway.isUp())

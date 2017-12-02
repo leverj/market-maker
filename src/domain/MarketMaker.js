@@ -91,7 +91,7 @@ export default class MarketMaker {
 
   _storeInFile_(book) {
     const filename = new Date().toISOString()
-    const dir = `data/books/${this.currenciesCode}`
+    const dir = `data/markets/${this.currenciesCode}`
     const path = `${dir}/${filename}`
     mkdirp(dir, (e) => {
       if (e) exceptionHandler(e)

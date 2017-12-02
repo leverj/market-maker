@@ -20,7 +20,7 @@ export default class Gatecoin extends ExchangeGateway {
   options(method, url) {
     const {privateKey, publicKey} = this.config
     const contentType = method == 'GET' ? '' : 'application/json'
-    const now = Date.now() / 1000  // fixme: let's figure out if there is a tollerance issue
+    const now = Date.now() / 1000
     const message = `${method}${url}${contentType}${now}`.toLowerCase()
     const signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(message, privateKey))
     return {
@@ -92,7 +92,7 @@ export default class Gatecoin extends ExchangeGateway {
   }
 
   subscribe(currencies, callback) {
-    const channels = [`trade.${currencies.code}`]
+    const channels = [`order.${currencies.code}`]
     this.substriber = new GatecoinPubNubSubscriber(`${this.name}.PubNub subscriber [${channels}` , channels, callback)
   }
 

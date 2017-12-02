@@ -8,8 +8,8 @@ export default class Currency extends ImmutableObject {
     if (!currencies.has(symbol)) currencies.set(symbol, new Currency(Map({symbol: symbol})))
     return currencies.get(symbol)
   }
-  static pairOf(primarySymbol, secondarySymbol) { return this.pair(this.of(primarySymbol), this.of(secondarySymbol)) }
-  static pair(primary, secondary) { return CurrencyPair.of(primary, secondary) }
+  static pair(primarySymbol, secondarySymbol) { return CurrencyPair.of(this.of(primarySymbol), this.of(secondarySymbol)) }
+  static pairWithCode(code) { return CurrencyPair.withCode(code) }
 
   constructor(map) { super(map) }
   get symbol() { return this.get('symbol') }
@@ -28,8 +28,9 @@ class CurrencyPair extends ImmutableObject {
       secondary: secondary.map,
       code: code,
     })))
-    return pairs.get(code)
+    return this.withCode(code)
   }
+  static withCode(code) { return pairs.get(code) }
 
   constructor(map) { super(map) }
   get primary() { return this.get('primary') }

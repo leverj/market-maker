@@ -79,8 +79,8 @@ describe('Order', () => {
 
       expect(order.isRelatedTo(order.placeWith('whatever-id', order.timestamp))).toBe(false)
       expect(order.isRelatedTo(Order.ask(quantity - 1, price, currencies))).toBe(false)
-      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('whatever', 'ETH')))).toBe(false)
-      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pairOf('LEV', 'whatever')))).toBe(false)
+      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pair('whatever', 'ETH')))).toBe(false)
+      expect(order.isRelatedTo(Order.ask(quantity, price, Currency.pair('LEV', 'whatever')))).toBe(false)
       expect(order.isRelatedTo(Order.ask(quantity, price + 1.00, currencies))).toBe(false)
       expect(order.isRelatedTo(Order.bid(quantity, price, currencies))).toBe(false)
     })

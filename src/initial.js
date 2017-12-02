@@ -23,6 +23,6 @@ export function makeMarketMaker() {
   const exchange = new Exchange(gateway)
   const {depth, quantity, step} = config.strategies.fixed
   const strategy = SpreadStrategy.fixed(depth, quantity, step)
-  const currencies = Currency.pairOf('LEV', 'ETH')
+  const currencies = Currency.pair('LEV', 'ETH')
   return MarketMaker.of(exchange, strategy, currencies)
 }

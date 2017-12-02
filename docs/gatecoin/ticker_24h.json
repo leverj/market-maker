@@ -1,0 +1,21 @@
+[
+  {
+    "ticker": {
+      "timeframe": "24h",
+      "high": 337.2,
+      "low": 330.7,
+      "vol": 3205.571,
+      "vwap": 333.500413118287,
+      "open": 331.1,
+      "last": 333.44,
+      "now": 1447917201
+    },
+    "channel": "ticker_24h.BTCUSD",
+    "channelName": "ticker_24h.BTCUSD",
+    "currency": "USD",
+    "item": "BTC",
+    "stamp": 1447917201
+  },
+  "14479172014745348",
+  "ticker_24h.BTCUSD"
+]
