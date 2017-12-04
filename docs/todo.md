@@ -1,7 +1,5 @@
 ## stories
 - pubnub subscription to trades push notifications
-- funnel respondTo(trade) callbacks via queue
-- lock respondTo(trade) queue processing while synchronizing with exchange
 - timed-out gateway rest calls
 
 ## build

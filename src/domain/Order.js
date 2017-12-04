@@ -33,7 +33,20 @@ export default class Order extends ImmutableObject {
   get price() { return this.map.get('price')}
   get quantity() { return this.map.get('quantity') }
   get remaining() { return this.map.get('remaining') }
+  get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
+  toString() {
+    const primary = this.getIn(['currencies', 'primary', 'symbol'])
+    const secondary = this.getIn(['currencies', 'secondary', 'symbol'])
+    return `${this.side} ${this.quantity} ${primary} @ ${this.price} ${secondary} (${this.remaining} remaining)`
+  }
+  toLongString() { return `${this.toString()} [${this.id} : ${this.timestamp}]` }
 
+  get isBid() { return this.side == Side.bid}
+  get isAsk() { return this.side == Side.ask }
+  get isPlaced() { return !!(this.id) }
+  get isNew() { return this.quantity == this.remaining }
+  get isFulfilled() { return this.remaining == 0 }
+  get isPartial() { return !this.isNew && !this.isFulfilled }
   isRelatedTo(that) { return this.isLike(that) && this.id == that.id }
   isLike(that) {
     return (
@@ -44,24 +57,13 @@ export default class Order extends ImmutableObject {
     )
   }
 
-  get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
-  get isBid() { return this.side == Side.bid}
-  get isAsk() { return this.side == Side.ask }
-
-  get isPlaced() { return !!(this.id) }
-  get isNew() { return this.quantity == this.remaining }
-  get isFulfilled() { return this.remaining == 0 }
-  get isPartial() { return !this.isNew && !this.isFulfilled }
-  toString() { return `[${this.id}] ${this.side} ${this.quantity} ${this.currencies.primary} @ ${this.price} ${this.currencies.secondary} (${this.remaining} remaining)` }
+  withRemaining(remaining) { return new Order(this.map.merge({remaining: remaining})) }
+  less(quantity) {
+    assert(quantity <= this.remaining, `only ${this.remaining} remaining; ${this.remaining} is too large`)
+    return this.withRemaining(this.remaining - quantity)
+  }
 
   placeWith(id, timestamp = new Date /* UTC */) { return new Order(this.map.merge({id: id, timestamp: timestamp})) }
-
-  _less_(quantity) {
-    assert(quantity <= this.remaining, `only ${this.remaining} remaining; ${this.remaining} is too large`)
-    return this._withRemaining_(this.remaining - quantity)
-  }
-  _withRemaining_(remaining) { return new Order(this.map.merge({remaining: remaining})) }
-
 }
 
 export const Side = {ask: 'Ask', bid: 'Bid'}
@@ -70,7 +72,7 @@ export const Side = {ask: 'Ask', bid: 'Bid'}
 class ComparableOrder extends Order {
   constructor(map) { super(map) }
 
-  /* overriding (ValueObject) equality to compare using similarity */
+  /** overriding (ValueObject) equality to compare using similarity */
   hashCode() { return this.side.length * this.price * this.quantity * this.remaining * this.currencies.hashCode() }
   equals(that) { return this.isSimilarTo(that) }
   isSimilarTo(that) { return this.isLike(that) && this.remaining == that.remaining }

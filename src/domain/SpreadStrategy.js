@@ -5,6 +5,13 @@ import {decimalPlaces, toDecimalPlaces} from '../common/numbers'
 
 
 export default class SpreadStrategy {
+  static fromConfig(config) {
+    switch (config.type) {
+      case 'fixed': return SpreadStrategy.fixed(config.depth, config.quantity, config.step)
+      default: throw new Error(`unrecognized spread strategy: ${config.type}`)
+    }
+  }
+
   static fixed(depth, quantity, step) {
     assert(depth >= 1, `${depth} : depth must be 1 or greater`)
     assert(quantity > 0, `${quantity} : quantity must be 1 or greater`)
@@ -12,7 +19,7 @@ export default class SpreadStrategy {
     return new FixedSpread(depth, quantity, step)
   }
 
-  generateOrdersFor(price, currencies) { throw new TypeError('Must override method') }
+  applyTo(price, currencies) { throw new TypeError('Must override method') }
 }
 
 
@@ -24,7 +31,7 @@ class FixedSpread extends SpreadStrategy {
     this.step = step
   }
 
-  generateOrdersFor(price, currencies) {
+  applyTo(price, currencies) {
     const precision = decimalPlaces(price)
     return Range(1, this.depth + 1).flatMap(i =>
       List.of(

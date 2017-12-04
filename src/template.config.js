@@ -1,10 +1,13 @@
 export const config = {
   env: '',
-  strategies: {
-    fixed: {
-      depth: -1, quantity:  -1, step:  -1
-    }
-  },
+  markets: [
+    {
+      currencies: { primary: 'LEV', secondary: 'ETH' },
+      spread: { type: 'fixed', depth: 3, quantity: 1, step: 0.1 },
+      trades: { limit: 100, timeout_milliseconds: 1000 },
+      save_changes: true
+    },
+  ],
   gateways: {
     Gatecoin: {
       privateKey: '',

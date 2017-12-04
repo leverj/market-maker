@@ -2,6 +2,7 @@ import {List, Map} from 'immutable'
 import CryptoJS from 'crypto-js'
 import fetchival from 'fetchival'
 import fetch from 'node-fetch'
+import {log} from '../common/globals'
 import ExchangeGateway from './ExchangeGateway'
 import Order, {Side} from '../domain/Order'
 
@@ -14,7 +15,7 @@ export default class Gatecoin extends ExchangeGateway {
   constructor(config) {
     super('Gatecoin')
     this.config = config
-    if (!this.isUp()) console.log(`${apiUrl} api is offline :-(`)
+    if (!this.isUp()) log(`${apiUrl} api is offline :-(`)
   }
 
   options(method, url) {
@@ -96,7 +97,13 @@ export default class Gatecoin extends ExchangeGateway {
     this.substriber = new GatecoinPubNubSubscriber(`${this.name}.PubNub subscriber [${channels}` , channels, callback)
   }
 
+  shutdown() { if (this.substriber) this.substriber.shutdown() }
 }
+
+
+const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')
+
+const fromSecondsStringToDate = (seconds) => new Date(seconds * 1000)
 
 const validate = (response) => isOK(response) ? true : throwError(response)
 const isOK = (response) => response.responseStatus.message == 'OK'
@@ -104,8 +111,3 @@ const throwError = (response) => {
   const {errorCode, message} = response.responseStatus
   throw new Error(`[${errorCode}] ${message}`)
 }
-
-const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')
-
-const fromSecondsStringToDate = (seconds) => new Date(seconds * 1000)
-

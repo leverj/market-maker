@@ -1,11 +1,11 @@
 import uuidv4 from 'uuid/v4'
-import * as fixtures from './fixtures'
 import ExchangeGateway, {TradeSubscriber} from '../../gateways/ExchangeGateway'
 import OrderBook from '../../domain/OrderBook'
+import CurrencyPair from "../../domain/CurrencyPair"
 
 
 export default class StubbedGateway extends ExchangeGateway {
-  constructor(exchangeRate = 0, currencies = fixtures.currencies) {
+  constructor(exchangeRate = 0, currencies = CurrencyPair.of('LEV', 'ETH')) {
     super('Playground')
     this.book = OrderBook.of(currencies)
     this.exchangeRate = exchangeRate

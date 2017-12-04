@@ -22,7 +22,8 @@ export default class OrderBook extends ImmutableObject {
   get bids() { return this.orders.filter(each => each.isBid) }
   get asks() { return this.orders.filter(each => each.isAsk) }
   get size() { return this.get('orders').size }
-  toString() { return `[${this.currencies.code} OrderBook] : ${this.size}` }
+  get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
+  toString() { return `${this.currenciesCode} OrderBook [${this.size} orders]` }
 
   getOrder(id) { return new Order(this.getIn(['orders', id])) }
   hasOrder(id) { return this.hasIn(['orders', id]) }
@@ -37,11 +38,11 @@ export default class OrderBook extends ImmutableObject {
   }
 
   without(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
-  mergeWith(order) { return this.hasOrder(order.id) ?  this._modify_(order) : this._add_(order)}
-  _add_(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
-  _modify_(order) { return new OrderBook(this.map.setIn(['orders', order.id, 'remaining'], order.remaining)) }
+  mergeWith(order) { return this.hasOrder(order.id) ?  this.modify(order) : this.add(order)}
+  add(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
+  modify(order) { return new OrderBook(this.map.setIn(['orders', order.id, 'remaining'], order.remaining)) }
 }
 
 
-export const ordersToMap = (orders) => Map(orders.map(each => [each.id, each.map]))
+const ordersToMap = (orders) => Map(orders.map(each => [each.id, each.map]))
 

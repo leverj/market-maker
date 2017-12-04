@@ -1,11 +1,11 @@
-import * as fixtures from '../common/test_helpers/fixtures'
 import {List} from 'immutable'
 import OrderBook from './OrderBook'
 import Order from './Order'
+import CurrencyPair from "./CurrencyPair"
 
 
 describe('OrderBook', () => {
-  const currencies = fixtures.currencies
+  const currencies = CurrencyPair.of('LEV', 'ETH')
   const quantity = 10, price = 110.0
   const now = new Date
   const orders = List.of(
@@ -68,6 +68,16 @@ describe('OrderBook', () => {
 
       expect(() => { OrderBook.of(currencies, orders.push(Order.ask(quantity, price, currencies))) }).
         toThrow(/orders within a book must first be placed \(have an id\)/)
+    })
+  })
+
+  describe('getters & queries', () => {
+    it('getters', () => {
+      expect(book.orders.size).toBe(4)
+      expect(book.asks.size).toBe(2)
+      expect(book.bids.size).toBe(2)
+      expect(book.currenciesCode).toBe('LEVETH')
+      expect(book.toString()).toBe('LEVETH OrderBook [4 orders]')
     })
   })
 

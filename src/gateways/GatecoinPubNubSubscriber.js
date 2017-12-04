@@ -1,6 +1,7 @@
 import PubNub from 'pubnub'
+import {log} from '../common/globals'
 import {TradeSubscriber} from './ExchangeGateway'
-import Currency from './Currency'
+import CurrencyPair from './CurrencyPair'
 import Order, {Side} from './Order'
 import {Map} from "immutable"
 
@@ -44,17 +45,17 @@ export class GatecoinPubNubSubscriber extends TradeSubscriber {
 
   //fixme: is this an async call?
   verifyConnection() {
-    this.pubnub.time(function(status, response) {
+    this.pubnub.time((status, response) => {
       status.error ?
         this.exceptionHandler(status.error) :
-        console.log(`${this} subscription is on (${response.timetoken})`)
+        log(`${this} subscription is on (${response.timetoken})`)
     })
   }
 
   tradeFrom(message) {
     const {oid, code, side, price, initAmount, remainAmout, status} = message.order
     const timestamp = order.stamp //fixme: convert to UTC date, or just ignore the whole thing ?
-    const currencies = Currency.pairWithCode(code)
+    const currencies = CurrencyPair.get(code)
     return new Order(Map({
       id: oid,
       timestamp: undefined,

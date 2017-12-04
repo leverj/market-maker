@@ -1,6 +1,6 @@
 import {print} from '../common/globals'
 import {sleep} from '../common/promises'
-import Currency from '../domain/Currency'
+import CurrencyPair from '../domain/CurrencyPair'
 import Order from '../domain/Order'
 import Gatecoin from './Gatecoin'
 import {config} from '../config'
@@ -14,7 +14,7 @@ import {config} from '../config'
  */
 describe.skip('Gatecoin api', () => {
   const gateway = new Gatecoin(config.gateways.Gatecoin_test)
-  const currencies = Currency.pair('BTC', 'USD')
+  const currencies = CurrencyPair.of('BTC', 'USD')
 
   it('api should be connected', async () => {
     expect(await gateway.isUp())

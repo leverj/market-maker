@@ -1,9 +1,17 @@
-import * as fixtures from '../common/test_helpers/fixtures'
 import {List} from 'immutable'
 import SpreadStrategy from './SpreadStrategy'
+import CurrencyPair from "./CurrencyPair"
 
 
 describe('Spread Strategy', () => {
+  const currencies = CurrencyPair.of('LEV', 'ETH')
+  
+  it('should construct from config', () => {
+    const fixed = SpreadStrategy.fromConfig({ type: 'fixed', depth: 3, quantity: 1, step: 0.1 })
+    expect(fixed.depth).toBe(3)
+    expect(fixed.quantity).toBe(1)
+    expect(fixed.step).toBe(0.1)
+  })
 
   describe('fixed spread', () => {
     const depth = 3, quantity = 1, step = 0.1
@@ -12,7 +20,7 @@ describe('Spread Strategy', () => {
     describe('generating orders', () => {
       it('should generate symmetric bid & ask orders', () => {
         const price = 10.50
-        const orders = spread.generateOrdersFor(price, fixtures.currencies)
+        const orders = spread.applyTo(price, currencies)
         const bids = orders.filter(each => each.isBid)
         const asks = orders.filter(each => each.isAsk)
 
@@ -32,7 +40,6 @@ describe('Spread Strategy', () => {
       expect(() => { SpreadStrategy.fixed(depth, quantity, 0) }).toThrow(/step must be positive price increment/)
       expect(() => { SpreadStrategy.fixed(depth, quantity, -0.1) }).toThrow(/step must be positive price increment/)
     })
-
   })
 
 })
