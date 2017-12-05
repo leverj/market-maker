@@ -3,17 +3,14 @@ import {sleep} from '../common/promises'
 import CurrencyPair from '../domain/CurrencyPair'
 import Order from '../domain/Order'
 import Gatecoin from './Gatecoin'
-import {config} from '../config'
+import {config} from '../../config/application.config'
 
 
 /**
  * these tests hit a live Gatecoin api server, so by default they are skipped
- *
- * !!!!! Be aware that running the tests wipes out all current trades for specifified <currencies> !!!!!
- * (we might want to change this)
  */
 describe.skip('Gatecoin api', () => {
-  const gateway = new Gatecoin(config.gateways.Gatecoin_test)
+  const gateway = Gatecoin.from(config.gateways.Gatecoin_test)
   const currencies = CurrencyPair.of('BTC', 'USD')
 
   it('api should be connected', async () => {

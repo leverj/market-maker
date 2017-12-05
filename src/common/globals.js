@@ -4,8 +4,8 @@ export const log = (message) => console.log(message)
 
 export const JobQueue = {
   fromConfig: (config) => {
-    const {capacity, timeout_milliseconds} = config
-    const q = queue({limit: capacity, timeout: timeout_milliseconds, autostart: true})
+    const {capacity, timeout} = config
+    const q = queue({limit: capacity, timeout: timeout, autostart: true})
     q.on('success', (result, job) => log(`finished processing:${job.toString().replace(/\n/g, '')}`))
     q.on('error', (e, job) => { log(`encountered a problem with ${job.toString().replace(/\n/g, '')}`, e); throw e })
     q.on('timeout', (next, job) => { log(`job timed out:, ${job.toString().replace(/\\n/g, '')}`); next() })

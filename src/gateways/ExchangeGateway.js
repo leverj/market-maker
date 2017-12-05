@@ -9,6 +9,7 @@ import {exceptionHandler} from '../common/globals'
     this.name = name
     this.exceptionHandler = exceptionHandler
   }
+  toString() { return `[${this.name} gateway]` }
 
   /** returns a List of pending orders */
   async getCurrentOrdersFor(currencies) { throw new TypeError('Must override method') }

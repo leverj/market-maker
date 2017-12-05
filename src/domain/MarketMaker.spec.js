@@ -12,7 +12,7 @@ describe('MarketMaker', () => {
   const config = {
     currencies: {primary: 'LEV', secondary: 'ETH'},
     spread: {type: 'fixed', depth: 3, quantity: 2, step: 0.1},
-    trades: {limit: 100, timeout_milliseconds: 1000},
+    trades: {limit: 100, timeout: 1000},
     save_changes: false
   }
   const currencies = CurrencyPair.fromConfig(config.currencies)

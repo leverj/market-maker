@@ -3,31 +3,40 @@ import CryptoJS from 'crypto-js'
 import fetchival from 'fetchival'
 import fetch from 'node-fetch'
 import {log} from '../common/globals'
-import ExchangeGateway from './ExchangeGateway'
+import {withTimeout} from '../common/promises'
 import Order, {Side} from '../domain/Order'
+import ExchangeGateway from './ExchangeGateway'
+import GatecoinPubNubSubscriber from './GatecoinPubNubSubscriber'
 
 fetchival.fetch = fetch
 const rest = fetchival
 
 
-//fixme: configure time out for all rest calls
 export default class Gatecoin extends ExchangeGateway {
-  constructor(config) {
-    super('Gatecoin')
-    this.config = config
-    if (!this.isUp()) log(`${apiUrl} api is offline :-(`)
+  static from(config) {
+    const {apiUrl, privateKey, publicKey, subscribeKey, timeout} = config
+    return new Gatecoin(apiUrl, privateKey, publicKey, subscribeKey, timeout)
   }
 
-  options(method, url) {
-    const {privateKey, publicKey} = this.config
+  constructor(apiUrl, privateKey, publicKey, subscribeKey, timeout) {
+    super('Gatecoin')
+    this.apiUrl = apiUrl
+    this.privateKey = privateKey
+    this.publicKey = publicKey
+    this.subscribeKey = subscribeKey
+    this.timeout = timeout
+    if (!this.isUp()) log(`${this} ${apiUrl} api is offline :-(`)
+  }
+
+  withOptions(method, url) {
     const contentType = method == 'GET' ? '' : 'application/json'
     const now = Date.now() / 1000
     const message = `${method}${url}${contentType}${now}`.toLowerCase()
-    const signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(message, privateKey))
+    const signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(message, this.privateKey))
     return {
       strictSSL: false,
       headers: {
-        'API_PUBLIC_KEY': publicKey,
+        'API_PUBLIC_KEY': this.publicKey,
         'API_REQUEST_SIGNATURE': signature,
         'API_REQUEST_DATE': now,
         'Content-Type': contentType
@@ -35,18 +44,20 @@ export default class Gatecoin extends ExchangeGateway {
     }
   }
 
-  isUp() {
+  async call(promise, url) { return withTimeout(this.timeout, promise, `calling ${url}`) }
+
+  async isUp() {
     const endpoint = '/Ping'
-    const url = `${this.config.apiUrl}${endpoint}?message=pong`
-    return rest(url, this.options('POST', url)).post().
+    const url = `${this.apiUrl}${endpoint}?message=pong`
+    return this.call(rest(url, this.withOptions('POST', url)).post(), url).
       then((response) => validate(response) && response.isConnected).
       catch(this.exceptionHandler)
   }
 
   async getCurrentOrdersFor(currencies) {
     const endpoint = '/Trade/Orders'
-    const url = `${this.config.apiUrl}${endpoint}`
-    return rest(url, this.options('GET', url)).get().
+    const url = `${this.apiUrl}${endpoint}`
+    return this.call(rest(url, this.withOptions('GET', url)).get(), url).
       then((response) => validate(response) && List(response.orders).
         filter(each => each.code == currencies.code).
         map(each =>
@@ -54,7 +65,7 @@ export default class Gatecoin extends ExchangeGateway {
             id: each.clOrderId,
             timestamp: fromSecondsStringToDate(each.date),
             currencies: currencies,
-            side: (each.side == 1 ? Side.ask : Side.bid),
+            side: (each.side == 1 ? Side.ask : Side.bid), //fixme: clarify numeric value conversion: ask = 1, bid = ?
             price: each.price,
             quantity: each.initialQuantity,
             remaining: each.remainingQuantity,
@@ -64,8 +75,8 @@ export default class Gatecoin extends ExchangeGateway {
 
   getLastExchangeRateFor(currencies) {
     const endpoint = '/Public/LiveTicker'
-    const url = `${this.config.apiUrl}${endpoint}/${currencies.code}`
-    return rest(url, this.options('GET', url)).get().
+    const url = `${this.apiUrl}${endpoint}/${currencies.code}`
+    return this.call(rest(url, this.withOptions('GET', url)).get(), url).
       then((response) => validate(response) && response.ticker.last).
       catch(this.exceptionHandler)
   }
@@ -78,23 +89,23 @@ export default class Gatecoin extends ExchangeGateway {
       Price: order.price,
     }
     const endpoint = '/Trade/Orders'
-    const url = `${this.config.apiUrl}${endpoint}?${toQueryString(parameters)}`
-    return rest(url, this.options('POST', url)).post().
+    const url = `${this.apiUrl}${endpoint}?${toQueryString(parameters)}`
+    return this.call(rest(url, this.withOptions('POST', url)).post(), url).
       then((response) => validate(response) && response.clOrderId).
       catch(this.exceptionHandler)
   }
 
   cancel(order) {
     const endpoint = '/Trade/Orders'
-    const url = `${this.config.apiUrl}${endpoint}/${order.id}`
-    return rest(url, this.options('DELETE', url)).delete().
+    const url = `${this.apiUrl}${endpoint}/${order.id}`
+    return this.call(rest(url, this.withOptions('DELETE', url)).delete(), url).
       then((response) => validate(response) && isOK(response)).
       catch(this.exceptionHandler)
   }
 
   subscribe(currencies, callback) {
     const channels = [`order.${currencies.code}`]
-    this.substriber = new GatecoinPubNubSubscriber(`${this.name}.PubNub subscriber [${channels}` , channels, callback)
+    this.substriber = new GatecoinPubNubSubscriber(this.subscribeKey, channels, callback)
   }
 
   shutdown() { if (this.substriber) this.substriber.shutdown() }

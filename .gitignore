@@ -7,7 +7,8 @@ coverage/
 data/
 logs/
 *.log
-src/config.js
+config/*.config.js
+config/*.json
 
 .idea/
 .DS_Store

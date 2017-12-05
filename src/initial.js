@@ -1,16 +1,15 @@
-import {exceptionHandler} from './common/globals'
 import Exchange from './domain/Exchange'
 import MarketMaker from './domain/MarketMaker'
 import StubbedGateway from './common/test_helpers/StubbedGateway'
 import Gatecoin from './gateways/Gatecoin'
-import {config} from './config'
+import {config} from '../config/application.config'
 
 
 const chooseGateway = (env) => {
   switch (env) {
     case 'dev': return new StubbedGateway()
-    case 'staging': return new Gatecoin(config.Gatecoin_test, exceptionHandler)
-    case 'production': return new Gatecoin(config.Gatecoin, exceptionHandler) //fixme: using this for production
+    case 'staging': return Gatecoin.from(config.Gatecoin_test)
+    case 'production': return Gatecoin.from(config.Gatecoin) //fixme: using this for production
   }
   throw new Error(`unrecognized environment parameter: ${env}`)
 }

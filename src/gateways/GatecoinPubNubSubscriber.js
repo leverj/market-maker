@@ -1,15 +1,15 @@
 import PubNub from 'pubnub'
 import {log} from '../common/globals'
 import {TradeSubscriber} from './ExchangeGateway'
-import CurrencyPair from './CurrencyPair'
-import Order, {Side} from './Order'
+import CurrencyPair from '../domain/CurrencyPair'
+import Order, {Side} from '../domain/Order'
 import {Map} from "immutable"
 
 
 export class GatecoinPubNubSubscriber extends TradeSubscriber {
-  constructor(name, channels, callback, config) {
-    super(name, channels, callback)
-    this.pubnub = new PubNub({ subscribeKey: config.subscribeKey })
+  constructor(subscribeKey, channels, callback) {
+    super('Gatecoin.PubNub', channels, callback)
+    this.pubnub = new PubNub({ subscribeKey: subscribeKey })
     /*
     this.pubnub = new PubNub({
       uuid: `leverj_${new Date()}`,
@@ -22,6 +22,7 @@ export class GatecoinPubNubSubscriber extends TradeSubscriber {
     */
     this.subscribe()
   }
+  toString() { return `${this.name} subscriber [${this.channels}]` }
 
   subscribe() {
     this.verifyConnection()

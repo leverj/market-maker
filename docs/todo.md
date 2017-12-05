@@ -1,6 +1,5 @@
 ## stories
 - pubnub subscription to trades push notifications
-- timed-out gateway rest calls
 
 ## build
 - CircleCI integration 
