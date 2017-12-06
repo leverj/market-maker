@@ -3,7 +3,6 @@ import {getLogger} from '../common/globals'
 import {TradeSubscriber} from './ExchangeGateway'
 import CurrencyPair from '../domain/CurrencyPair'
 import Order, {Side} from '../domain/Order'
-import {Map} from "immutable"
 
 
 /**
@@ -12,19 +11,21 @@ import {Map} from "immutable"
  */
 export class GatecoinPubNubSubscriber extends TradeSubscriber {
 
+  /** returns null if conversion failed */
   static tradeFrom(message) {
-    const {oid, code, side, price, initAmount, remainAmout, status} = message.order
-    // const timestamp = order.stamp //fixme: convert to UTC date, or just ignore the whole thing ?
-    const currencies = CurrencyPair.get(code)
-    return new Order(Map({
-      id: oid,
-      timestamp: undefined,
-      currencies: currencies.map,
-      side: (side == 0 ? Side.ask : Side.bid),
-      price: price,
-      quantity: initAmount,
-      remaining: remainAmout,
-    }))
+    const trade = JSON.parse(message)
+    const {oid, code, side, price, initAmount, remainAmout, status} = trade.order
+    if (!CurrencyPair.has(code)) return null
+    if (remainAmout == initAmount) return null
+    try {
+      const timestamp = new Date(trade.stamp)
+      const currencies = CurrencyPair.get(code)
+      const theSide = (side == 0) ? Side.ask : Side.bid
+      return Order.of(theSide, initAmount, price, currencies).withRemaining(remainAmout).placeWith(oid, timestamp)
+    } catch (e) {
+      log.warn('bad trade: %s', message, e)
+      return null
+    }
   }
 
   constructor(subscribeKey, channels, callback) {
@@ -59,7 +60,11 @@ export class GatecoinPubNubSubscriber extends TradeSubscriber {
       },
      */
     this.listener = this.pubnub.addListener({
-      message: (message) => this.callback(this.tradeFrom(message))
+      message: (message) => {
+        const trade = this.tradeFrom(message)
+        /* trade is null if conversion failed */
+        if (!!trade) this.callback(trade)
+      }
     })
     this.pubnub.subscribe({channels: this.channels})
   }

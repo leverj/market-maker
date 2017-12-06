@@ -57,7 +57,11 @@ export default class Order extends ImmutableObject {
     )
   }
 
-  withRemaining(remaining) { return new Order(this.map.merge({remaining: remaining})) }
+  withRemaining(remaining) {
+    assert(remaining < this.quantity, `remaining=${remaining} must be less then quantity=${this.quantity}`)
+    return new Order(this.map.merge({remaining: remaining}))
+  }
+
   less(quantity) {
     assert(quantity <= this.remaining, `only ${this.remaining} remaining; ${this.remaining} is too large`)
     return this.withRemaining(this.remaining - quantity)

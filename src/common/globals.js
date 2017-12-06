@@ -35,7 +35,7 @@ export const JobQueue = {
     const {capacity, timeout} = config
     const q = queue({limit: capacity, timeout: timeout, autostart: true})
     q.on('success', (result, job) => log.debug('finished processing: %s', jobToString(job)))
-    q.on('error', (e, job) => { log.error('encountered a problem with: %s error: %s', jobToString(job), e); throw e })
+    q.on('error', (e, job) => { log.error('encountered a problem with: %s', jobToString(job), e); throw e })
     q.on('timeout', (next, job) => { log.error('job timed out: %s', jobToString(job)); next() })
 //    q.on('end', (errors) => log.debug(`DONE :-${errors ? '(' : ')'}`)) //fixme: to be or not to be DONE?
     return q

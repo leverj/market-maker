@@ -10,7 +10,7 @@ const config = configure('application.json')
 /**
  * these tests hit a live Gatecoin api server, so by default they are skipped
  */
-describe.skip('Gatecoin api', () => {
+describe('Gatecoin api', () => {
   const log = getLogger('Gatecoin')
   const gateway = Gatecoin.from(config.gateways.Gatecoin_test)
   const currencies = CurrencyPair.of('BTC', 'USD')

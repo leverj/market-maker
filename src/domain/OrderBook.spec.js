@@ -66,7 +66,7 @@ describe('OrderBook', () => {
       expect(book.size).toBe(orders.size)
       orders.forEach(each => expect(book.hasOrder(each.id)).toBe(true))
 
-      expect(() => { OrderBook.of(currencies, orders.push(Order.ask(quantity, price, currencies))) }).
+      expect(() => OrderBook.of(currencies, orders.push(Order.ask(quantity, price, currencies)))).
         toThrow(/orders within a book must first be placed \(have an id\)/)
     })
   })
@@ -119,13 +119,13 @@ describe('OrderBook', () => {
 
   describe('offset', () => {
     it('throw if an order cannot be offset', () => {
-      expect(() => { book.offset(Order.ask(quantity, price, currencies)) }).
+      expect(() => book.offset(Order.ask(quantity, price, currencies))).
         toThrow(/can only offset an existing order/)
-      expect(() => { book.offset(Order.ask(quantity, price, currencies).placeWith('no-such-id')) }).
+      expect(() => book.offset(Order.ask(quantity, price, currencies).placeWith('no-such-id'))).
         toThrow(/can only offset an existing order/)
-      expect(() => { book.offset(Order.ask(quantity, price, currencies).placeWith('id_1')) }).
+      expect(() => book.offset(Order.ask(quantity, price, currencies).placeWith('id_1'))).
         toThrow(/can only offset a related order/)
-      expect(() => { book.offset(Order.bid(quantity, price + 5, currencies).placeWith('id_1')) }).
+      expect(() => book.offset(Order.bid(quantity, price + 5, currencies).placeWith('id_1'))).
         toThrow(/can only offset a related order/)
     })
 

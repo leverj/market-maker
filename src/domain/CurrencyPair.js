@@ -6,6 +6,7 @@ import Currency from './Currency'
 /** I represent the notion of a primary currency traded in term of a secondary currency */
 export default class CurrencyPair extends ImmutableObject {
   static get(code) { return pairs.get(code) }
+  static has(code) { return pairs.has(code) }
 
   static of(primarySymbol, secondarySymbol) {
     const primary = Currency.of(primarySymbol), secondary = Currency.of(secondarySymbol)

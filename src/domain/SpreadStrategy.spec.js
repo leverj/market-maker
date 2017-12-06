@@ -35,10 +35,10 @@ describe('Spread Strategy', () => {
 
     it('a fixed spread has valid depth, quantity, and step', () => {
       const depth = 3, quantity = 1, step = 0.1
-      expect(() => { SpreadStrategy.fixed(0, quantity, step) }).toThrow(/depth must be 1 or greater/)
-      expect(() => { SpreadStrategy.fixed(depth, 0, step) }).toThrow(/quantity must be 1 or greater/)
-      expect(() => { SpreadStrategy.fixed(depth, quantity, 0) }).toThrow(/step must be positive price increment/)
-      expect(() => { SpreadStrategy.fixed(depth, quantity, -0.1) }).toThrow(/step must be positive price increment/)
+      expect(() => SpreadStrategy.fixed(0, quantity, step)).toThrow(/depth must be 1 or greater/)
+      expect(() => SpreadStrategy.fixed(depth, 0, step)).toThrow(/quantity must be 1 or greater/)
+      expect(() => SpreadStrategy.fixed(depth, quantity, 0)).toThrow(/step must be positive price increment/)
+      expect(() => SpreadStrategy.fixed(depth, quantity, -0.1)).toThrow(/step must be positive price increment/)
     })
   })
 

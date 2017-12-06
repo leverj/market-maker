@@ -93,7 +93,7 @@ export default class MarketMaker {
     const cancelled = await Promise.all(toCancel.map(each => this.exchange.cancel(each)))
     if (!cancelled.reduce((success, each) => success && each, true)) {
       //fixme: what should we do instead?
-      log.warn(`failed to cancel at least one of ${toCancel.join('\n')}`)
+      log.warn('failed to cancel at least one of %s', toCancel.join('\n'))
     }
     return this._store_(OrderBook.of(this.currencies, toKeep.merge(placed)))
   }
@@ -115,7 +115,7 @@ const storeInFile = (book) => {
   const path = `${dir}/${filename}`
   mkdirp(dir, (e) => {
     if (e) exceptionHandler(e)
-    const contents = book.orders.map((v, k) => JSON.stringify(v)).join('\n')
+    const contents = book.orders.map((v, k) => v.toLongString()).join('\n')
     fs.writeFile(path, contents, (e) => { if (e) exceptionHandler(e) })
   })
   return book

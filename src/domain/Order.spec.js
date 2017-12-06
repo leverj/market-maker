@@ -27,9 +27,9 @@ describe('Order', () => {
     })
 
     it('an order has valid quantity & price', () => {
-      expect(() => { Order.ask(0, price, currencies) }).toThrow(/quantity must be positive/)
-      expect(() => { Order.ask(-1, price, currencies) }).toThrow(/quantity must be positive/)
-      expect(() => { Order.ask(quantity, -1 * price, currencies) }).toThrow(/price must be positive/)
+      expect(() => Order.ask(0, price, currencies)).toThrow(/quantity must be positive/)
+      expect(() => Order.ask(-1, price, currencies)).toThrow(/quantity must be positive/)
+      expect(() => Order.ask(quantity, -1 * price, currencies)).toThrow(/price must be positive/)
     })
   })
 
