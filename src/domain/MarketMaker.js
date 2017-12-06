@@ -1,6 +1,6 @@
 import fs from 'fs'
 import mkdirp from 'mkdirp'
-import {JobQueue, exceptionHandler} from '../common/globals'
+import {getLogger, JobQueue, exceptionHandler} from '../common/globals'
 import {Lists} from '../common/van_diagrams'
 import CurrencyPair from './CurrencyPair'
 import Order from './Order'
@@ -92,7 +92,8 @@ export default class MarketMaker {
     const placed = await Promise.all(toPlace.map(each => this.exchange.place(each)))
     const cancelled = await Promise.all(toCancel.map(each => this.exchange.cancel(each)))
     if (!cancelled.reduce((success, each) => success && each, true)) {
-      log(`failed to cancel at least one of ${toCancel.join('\n')}`) //fixme: what should we do instead?
+      //fixme: what should we do instead?
+      log.warn(`failed to cancel at least one of ${toCancel.join('\n')}`)
     }
     return this._store_(OrderBook.of(this.currencies, toKeep.merge(placed)))
   }
@@ -106,17 +107,7 @@ export default class MarketMaker {
 }
 
 
-export const groupByCancelKeepPlace = (currentOrders, futureOrders) => {
-  const vanDiagram = Lists.vanDiagram(
-    currentOrders.map(each => Order.toComparable(each)),
-    futureOrders.map(each => Order.toComparable(each))
-  ).transform(eachList => eachList.map(each => new Order(each.map)))
-  return {
-    toCancel: vanDiagram.leftOnly,
-    toKeep: vanDiagram.intersection,
-    toPlace: vanDiagram.rightOnly
-  }
-}
+const log = getLogger('MarketMaker')
 
 const storeInFile = (book) => {
   const filename = new Date().toISOString()
@@ -130,3 +121,14 @@ const storeInFile = (book) => {
   return book
 }
 
+export const groupByCancelKeepPlace = (currentOrders, futureOrders) => {
+  const vanDiagram = Lists.vanDiagram(
+    currentOrders.map(each => Order.toComparable(each)),
+    futureOrders.map(each => Order.toComparable(each))
+  ).transform(eachList => eachList.map(each => new Order(each.map)))
+  return {
+    toCancel: vanDiagram.leftOnly,
+    toKeep: vanDiagram.intersection,
+    toPlace: vanDiagram.rightOnly
+  }
+}

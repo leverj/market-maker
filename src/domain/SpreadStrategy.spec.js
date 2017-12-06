@@ -6,7 +6,7 @@ import CurrencyPair from "./CurrencyPair"
 describe('Spread Strategy', () => {
   const currencies = CurrencyPair.of('LEV', 'ETH')
   
-  it('should construct from config', () => {
+  it('construct from config', () => {
     const fixed = SpreadStrategy.fromConfig({ type: 'fixed', depth: 3, quantity: 1, step: 0.1 })
     expect(fixed.depth).toBe(3)
     expect(fixed.quantity).toBe(1)
@@ -18,7 +18,7 @@ describe('Spread Strategy', () => {
     const spread = SpreadStrategy.fixed(depth, quantity, step)
 
     describe('generating orders', () => {
-      it('should generate symmetric bid & ask orders', () => {
+      it('generate symmetric bid & ask orders', () => {
         const price = 10.50
         const orders = spread.applyTo(price, currencies)
         const bids = orders.filter(each => each.isBid)
@@ -33,7 +33,7 @@ describe('Spread Strategy', () => {
       })
     })
 
-    it('a fixed spread should have valid depth, quantity, and step', () => {
+    it('a fixed spread has valid depth, quantity, and step', () => {
       const depth = 3, quantity = 1, step = 0.1
       expect(() => { SpreadStrategy.fixed(0, quantity, step) }).toThrow(/depth must be 1 or greater/)
       expect(() => { SpreadStrategy.fixed(depth, 0, step) }).toThrow(/quantity must be 1 or greater/)

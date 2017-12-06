@@ -1,6 +1,7 @@
 import * as matchers from 'jest-immutable-matchers'
 import Exchange from './Exchange'
 import StubbedGateway from '../common/test_helpers/StubbedGateway'
+import {sleep} from '../common/promises'
 import SpreadStrategy from './SpreadStrategy'
 import CurrencyPair from './CurrencyPair'
 import Order from './Order'
@@ -40,7 +41,7 @@ describe('MarketMaker', () => {
   describe("synchronize: after creation, synchronize with exchange's pending orders", () => {
     beforeEach( () => jest.addMatchers(matchers) )
 
-    it.only('if the exchange has pending orders, retrieve them', async () => {
+    it('if the exchange has pending orders, retrieve them', async () => {
       const marketMaker = makeMarketMaker(fullBook)
       expect(marketMaker.book.orders.size).toBe(0)
 
@@ -78,6 +79,7 @@ describe('MarketMaker', () => {
       // order with all  the same but the side
       const unrelatedTrade = Order.ask(order.quantity, order.price, order.currencies).placeWith(order.id, order.timestamp)
       await marketMaker.respondTo(unrelatedTrade)
+      await sleep(10) //give time for the trades queue to process
       expect(marketMaker.book.orders.size).toBe(fullBook.size)
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
     })
@@ -91,8 +93,8 @@ describe('MarketMaker', () => {
       expect(trade.isPartial).toBe(true)
 
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
-
       await marketMaker.respondTo(trade)
+      await sleep(10) //give time for the trades queue to process
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(1)
     })
 
@@ -105,8 +107,8 @@ describe('MarketMaker', () => {
       expect(trade.isFulfilled).toBe(true)
 
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
-
       await marketMaker.respondTo(trade)
+      await sleep(10) //give time for the trades queue to process
       expect(marketMaker.book.hasOrder(order.id)).toBe(false)
     })
   })

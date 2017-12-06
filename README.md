@@ -12,7 +12,8 @@ checkout [design notes](docs/design.md) for the intended functionality
 
 ## Usage
 
-- first, you need a valid `src/config.js` configuration (a [template](src/template.config.js) is provided)
+- you need a valid `config/application.json` configuration (a [template](config/templates/application.json) is provided)
+- you need a valid `config/log4js.json` logging configuration (a [template](config/templates/log4js.json) is provided)
 
 
 ## To do ...

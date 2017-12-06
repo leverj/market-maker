@@ -1,26 +1,32 @@
 ## stories
 - pubnub subscription to trades push notifications
 
+
 ## build
 - CircleCI integration 
   - github build badges
-  - bake build info (version/hash/tag ...)
   - docker image
+  - bake build info (version/hash/tag ...) with build process
+  - incorporate source maps
+
 
 ## production
 - consider getting rid of:
   - bubble
   - promise.then
-- proper logging (with levels, rotating log files and|or using ELK)
-  - using something like: bunyan, winston
-- notification mechanism for ops (can be incorporated via logging?)
-- exception handler (incorporate with logging and/or ops notifications)
+- logging configuration using log4js
+  - rotating log files 
+  - using ELK
+- exception handling 
+  - go over what to handle and how (warn -> error -> fatal)
+- notification for ops 
+  - configure and enable via log4js transports: smtp, slack, ... ?
 - integrate a monitoring solution
   - rancherOS
   - ps2
   - graphana + prometheus
-- npm `start` script not suitable for production (bubble)
 - Gatecoin
   - production site keys
   - trading account(2) with money (LEV ? ETH)
-  
+- npm `start` script not suitable for production (bubble)
+ 

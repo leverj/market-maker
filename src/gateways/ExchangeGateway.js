@@ -2,7 +2,10 @@ import {exceptionHandler} from '../common/globals'
 
 
 /**
- * gateway methods are external async calls
+ * gateway to an external exchange
+ * the gateway provides:
+ * 1. (async) rest api for tickers and orders
+ * 2. subscription to order's trading notifications
  */
  export default class ExchangeGateway {
   constructor(name) {

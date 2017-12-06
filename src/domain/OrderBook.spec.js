@@ -81,7 +81,7 @@ describe('OrderBook', () => {
     })
   })
 
-  describe('(private) insert / update/ delete of orders', () => {
+  describe('insert / update / delete of orders', () => {
     it('can add an order', () => {
       const before = book
       expect(!before.hasOrder('id_new'))
@@ -93,7 +93,7 @@ describe('OrderBook', () => {
       expect(after.size).toBe(before.size + 1)
     })
 
-    it('can without an order', () => {
+    it('can delete an order', () => {
       const before = book
       expect(before.hasOrder('id_1'))
 
@@ -118,7 +118,7 @@ describe('OrderBook', () => {
   })
 
   describe('offset', () => {
-    it('should throw if an order cannot be offset', () => {
+    it('throw if an order cannot be offset', () => {
       expect(() => { book.offset(Order.ask(quantity, price, currencies)) }).
         toThrow(/can only offset an existing order/)
       expect(() => { book.offset(Order.ask(quantity, price, currencies).placeWith('no-such-id')) }).
@@ -129,7 +129,7 @@ describe('OrderBook', () => {
         toThrow(/can only offset a related order/)
     })
 
-    it('should offset and maintain an order if it is not filled', () => {
+    it('offset and maintain an order if it is not filled', () => {
       const id = 'id_1'
       const before = book
       const existing = before.getOrder(id)
@@ -143,7 +143,7 @@ describe('OrderBook', () => {
       expect(after.getOrder(id).remaining).toBe(9)
     })
 
-    it('should offset and without an order if it is filled', () => {
+    it('offset and without an order if it is filled', () => {
       const id = 'id_1'
       const before = book
       const existing = before.getOrder(id)

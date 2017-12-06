@@ -2,7 +2,7 @@ import {List, Map} from 'immutable'
 import CryptoJS from 'crypto-js'
 import fetchival from 'fetchival'
 import fetch from 'node-fetch'
-import {log} from '../common/globals'
+import {getLogger} from '../common/globals'
 import {withTimeout} from '../common/promises'
 import Order, {Side} from '../domain/Order'
 import ExchangeGateway from './ExchangeGateway'
@@ -11,7 +11,10 @@ import GatecoinPubNubSubscriber from './GatecoinPubNubSubscriber'
 fetchival.fetch = fetch
 const rest = fetchival
 
-
+/**
+ * gateway to the Gatecoin API
+ * see: https://api.gatecoin.com/swagger-ui/index.html
+ */
 export default class Gatecoin extends ExchangeGateway {
   static from(config) {
     const {apiUrl, privateKey, publicKey, subscribeKey, timeout} = config
@@ -25,7 +28,7 @@ export default class Gatecoin extends ExchangeGateway {
     this.publicKey = publicKey
     this.subscribeKey = subscribeKey
     this.timeout = timeout
-    if (!this.isUp()) log(`${this} ${apiUrl} api is offline :-(`)
+    if (!this.isUp()) log.fatal(`${this} ${apiUrl} api is offline :-(`)
   }
 
   withOptions(method, url) {
@@ -111,6 +114,8 @@ export default class Gatecoin extends ExchangeGateway {
   shutdown() { if (this.substriber) this.substriber.shutdown() }
 }
 
+
+const log = getLogger('Gatecoin')
 
 const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')
 

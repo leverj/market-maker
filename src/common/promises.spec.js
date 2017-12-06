@@ -12,7 +12,7 @@ describe('promises', () => {
   })
 
   describe('withTimeout', () => {
-    it('should timeout if not given enough time', async () => {
+    it('timeout if not given enough time', async () => {
       let result = 'before'
       const doIt = () => sleep(20).then(resolve => 'after')
 
@@ -30,7 +30,7 @@ describe('promises', () => {
       expect(result).toEqual('after')
     })
 
-    it('should accomplish mission without waiting', async () => {
+    it('timely completion', async () => {
       let result = 'before'
       const doIt = () => sleep(10).then(resolve => 'after')
       withTimeout(30, doIt()).

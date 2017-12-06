@@ -26,7 +26,7 @@ describe('Order', () => {
       })
     })
 
-    it('an order should have valid quantity & price', () => {
+    it('an order has valid quantity & price', () => {
       expect(() => { Order.ask(0, price, currencies) }).toThrow(/quantity must be positive/)
       expect(() => { Order.ask(-1, price, currencies) }).toThrow(/quantity must be positive/)
       expect(() => { Order.ask(quantity, -1 * price, currencies) }).toThrow(/price must be positive/)
@@ -89,7 +89,7 @@ describe('Order', () => {
   })
 
   describe('isRelatedTo', () => {
-    it('should discern if orders are related (primary requirement when filling an order)', () => {
+    it('discern if orders are related (primary requirement when filling an order)', () => {
       expect(order.isRelatedTo(order.placeWith(order.id, new Date()))).toBe(true)
       expect(order.isRelatedTo(order.less(1))).toBe(true)
       expect(order.isRelatedTo(Order.ask(quantity, price, currencies))).toBe(true)
