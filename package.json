@@ -23,7 +23,8 @@
   "babel": {
     "presets": [
       "node8"
-    ]
+    ],
+    "sourceMaps": true
   },
   "jest": {
     "testMatch": [

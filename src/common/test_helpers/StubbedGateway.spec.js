@@ -3,7 +3,7 @@ import CurrencyPair from "../../domain/CurrencyPair"
 
 
 describe('simulating subscribe triggering registered callback', () => {
-  beforeEach( () => callbackResult = 'never called' )
+  beforeEach(() => callbackResult = 'never called' )
 
   describe('StubbedGateway', () => {
     it('be able to set & trigger a callback', async () => {

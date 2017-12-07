@@ -39,7 +39,7 @@ describe('MarketMaker', () => {
   }
 
   describe("synchronize: after creation, synchronize with exchange's pending orders", () => {
-    beforeEach( () => jest.addMatchers(matchers) )
+    beforeEach(() => jest.addMatchers(matchers))
 
     it('if the exchange has pending orders, retrieve them', async () => {
       const marketMaker = makeMarketMaker(fullBook)

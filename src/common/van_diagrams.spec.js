@@ -4,7 +4,7 @@ import {Lists, Maps, Sets, VanDiagram} from './van_diagrams'
 
 
 describe('Sets', () => {
-  beforeEach( () => jest.addMatchers(matchers) )
+  beforeEach(() => jest.addMatchers(matchers) )
   describe('vanDiagram', () => {
     it('discern a van diagram from two sets', () => {
       const left = Set([2, 3, 4, 5, 6]), right = Set([8, 7, 6, 5, 4])
@@ -18,7 +18,7 @@ describe('Sets', () => {
 
 
 describe('Lists', () => {
-  beforeEach( () => jest.addMatchers(matchers) )
+  beforeEach(() => jest.addMatchers(matchers) )
   describe('vanDiagram', () => {
     it('discern a van diagram from two lists', () => {
       const left = List([2, 2, 3, 4, 5, 6]), right = List([8, 8, 8, 7, 6, 5, 4])
@@ -32,7 +32,7 @@ describe('Lists', () => {
 
 
 describe('Maps', () => {
-  beforeEach( () => jest.addMatchers(matchers) )
+  beforeEach(() => jest.addMatchers(matchers) )
   describe('vanDiagram', () => {
     it('discern a van diagram from two maps', () => {
       const left = Map({one: 1, two: 2, three: 3}), right = Map({three: 3, four: 4, five: 5})

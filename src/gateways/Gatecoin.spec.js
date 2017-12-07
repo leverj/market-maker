@@ -1,19 +1,18 @@
-import {configure, getLogger} from '../common/globals'
+import {configure, print} from '../common/globals'
 import {sleep} from '../common/promises'
 import CurrencyPair from '../domain/CurrencyPair'
 import Order from '../domain/Order'
 import Gatecoin from './Gatecoin'
 
 
-const config = configure('application.json')
-
 /**
  * these tests hit a live Gatecoin api server, so by default they are skipped
  */
-describe('Gatecoin api', () => {
-  const log = getLogger('Gatecoin')
-  const gateway = Gatecoin.from(config.gateways.Gatecoin_test)
+describe.skip('Gatecoin api', () => {
+  const config = configure('application.json').gateways.Gatecoin
+  const gateway = Gatecoin.from(config)
   const currencies = CurrencyPair.of('BTC', 'USD')
+  // const currencies = CurrencyPair.of('LEV', 'ETH') //>>> Error: [1005] Insufficient funds <<< when attempting to place an error
 
   it('api should be connected', async () => {
     expect(await gateway.isUp())
@@ -21,13 +20,13 @@ describe('Gatecoin api', () => {
 
   it(`get live ticker for ${currencies}`, async () => {
     const exchangeRate = await gateway.getLastExchangeRateFor(currencies)
-    log.info(`${currencies} current exchange rate: ${exchangeRate}`)
+    print(`${currencies} current exchange rate: ${exchangeRate}`)
     expect(exchangeRate).toBeGreaterThan(0)
   })
 
   it(`get currently placed orders for ${currencies}`, async () => {
     const orders = await gateway.getCurrentOrdersFor(currencies)
-    log.info(`# of current orders: ${orders.size}`)
+    print(`# of current orders: ${orders.size}`)
     expect(orders.size).toBe(0)
   })
 
@@ -35,14 +34,14 @@ describe('Gatecoin api', () => {
     const quantity = 2, price = 999e+12 // deliberately unreasonably high to ensure it would not be fulfilled
     const order = Order.ask(quantity, price, currencies)
     const orderId = await gateway.place(order)
-    log.info(`Order [${orderId}] placed`)
+    print(`Order [${orderId}] placed`)
     expect(!!orderId).toBe(true)
 
     // give it some time, then clean up ...
     await sleep(100)
     const toCancel = order.placeWith(orderId)
     expect(await gateway.cancel(toCancel)).toBe(true)
-    log.info(`Order [${orderId}] cancelled`)
+    print(`Order [${orderId}] cancelled`)
   })
 
   it(`does not cancel a non-existing order`, async () => {
@@ -54,10 +53,10 @@ describe('Gatecoin api', () => {
     }
   })
 
-  it.skip(`<<< NOTE >>> if there's ever a need to cleanup all orders, this is a convenient way to do it`, async () => {
+  it(`<<< NOTE >>> if there's ever a need to cleanup all orders, this is a convenient way to do it`, async () => {
     const orders = await gateway.getCurrentOrdersFor(currencies)
-    log.info(`# of current orders: ${orders.size}`)
+    print(`# of current orders: ${orders.size}`)
     if (!orders.isEmpty())
-      log.info(`cancelled unexpected ${orders.size} orders: ${await Promise.all(orders.map(each => gateway.cancel(each)))}`)
+      print(`cancelled unexpected ${orders.size} orders: ${await Promise.all(orders.map(each => gateway.cancel(each)))}`)
   })
 })

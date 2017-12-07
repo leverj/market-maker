@@ -108,10 +108,10 @@ export default class Gatecoin extends ExchangeGateway {
 
   subscribe(currencies, callback) {
     const channels = [`order.${currencies.code}`]
-    this.substriber = new GatecoinPubNubSubscriber(this.subscribeKey, channels, callback)
+    this.subscriber = new GatecoinPubNubSubscriber(this.subscribeKey, channels, callback)
   }
 
-  shutdown() { if (this.substriber) this.substriber.shutdown() }
+  shutdown() { if (this.subscriber) this.subscriber.shutdown() }
 }
 
 

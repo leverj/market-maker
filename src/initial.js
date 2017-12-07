@@ -9,7 +9,7 @@ const config = configure('application.json')
 const chooseGateway = (env) => {
   switch (env) {
     case 'dev': return new StubbedGateway()
-    case 'staging': return Gatecoin.from(config.Gatecoin_test)
+    case 'staging': return Gatecoin.from(config.Gatecoin)
     case 'production': return Gatecoin.from(config.Gatecoin) //fixme: using this for production
     default: throw new Error(`unrecognized environment parameter: ${env}`)
   }

@@ -9,13 +9,13 @@ export default class StubbedGateway extends ExchangeGateway {
     super('Playground')
     this.book = OrderBook.of(currencies)
     this.exchangeRate = exchangeRate
-    this.substriber = null /* subscriber is populated on subscribe(...) call */
+    this.subscriber = null /* subscriber is populated on subscribe(...) call */
   }
 
   setBook(value) { this.book = value }
   setExchangeRate(value) { this.exchangeRate = value }
 
-  listenTo(trade) { this.substriber.listenTo(trade) }
+  listenTo(trade) { this.subscriber.listenTo(trade) }
 
   async getCurrentOrdersFor(currencies) { return Promise.resolve(this.book.orders) }
 
@@ -36,7 +36,7 @@ export default class StubbedGateway extends ExchangeGateway {
 
   subscribe(currencies, callback) {
     const channels = [`order.${currencies.code}`]
-    this.substriber = new StubbedSubscriber(`${this.name} subscriber`, channels, callback)
+    this.subscriber = new StubbedSubscriber(`${this.name} subscriber`, channels, callback)
   }
 }
 

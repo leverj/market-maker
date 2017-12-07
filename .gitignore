@@ -7,7 +7,6 @@ coverage/
 data/
 logs/
 *.log
-config/*.config.js
 config/*.json
 
 .idea/
