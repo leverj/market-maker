@@ -1,3 +1,4 @@
+import config from 'config'
 import * as matchers from 'jest-immutable-matchers'
 import Exchange from './Exchange'
 import StubbedGateway from '../common/test_helpers/StubbedGateway'
@@ -10,14 +11,14 @@ import MarketMaker, {groupByCancelKeepPlace} from './MarketMaker'
 
 
 describe('MarketMaker', () => {
-  const config = {
+  const conf = {
     currencies: {primary: 'LEV', secondary: 'ETH'},
     spread: {type: 'fixed', depth: 3, quantity: 2, step: 0.1},
     trades: {limit: 100, timeout: 1000},
     save_changes: false
   }
-  const currencies = CurrencyPair.fromConfig(config.currencies)
-  const spread = SpreadStrategy.fromConfig(config.spread)
+  const currencies = CurrencyPair.fromConfig(conf.currencies)
+  const spread = SpreadStrategy.fromConfig(conf.spread)
   const price = 10.50
   const fullBook = OrderBook.of(
     currencies,
@@ -32,11 +33,30 @@ describe('MarketMaker', () => {
 
   const makeMarketMaker = (book) => {
     const exchange = new Exchange(new StubbedGateway())
-    const maker = MarketMaker.fromConfig(exchange, config)
+    const maker = MarketMaker.fromConfig(exchange, conf)
     maker.exchange.gateway.setBook(book)
     maker.exchange.gateway.setExchangeRate(price)
     return maker
   }
+
+  describe("construction", () => {
+    it('from config', () => {
+      const marketMaker = MarketMaker.fromConfig(new Exchange(new StubbedGateway()), conf)
+      expect(marketMaker.book.orders.size).toBe(0)
+      expect(marketMaker.strategy.depth).toBe(3)
+      expect(marketMaker.currencies).toBe(currencies)
+      expect(marketMaker.saveChanges).toBe(false)
+    })
+
+    it('from config file', () => {
+      const conf = config.get('markets')[0]
+      const marketMaker = MarketMaker.fromConfig(new Exchange(new StubbedGateway()), conf)
+      expect(marketMaker.book.orders.size).toBe(0)
+      expect(marketMaker.strategy.depth).toBe(3)
+      expect(marketMaker.currencies).toBe(currencies)
+      expect(marketMaker.saveChanges).toBe(true)
+    })
+  })
 
   describe("synchronize: after creation, synchronize with exchange's pending orders", () => {
     beforeEach(() => jest.addMatchers(matchers))

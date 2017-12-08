@@ -1,0 +1,8 @@
+gateways:
+  Gatecoin: 
+    publicKey: jUCWb9WNrNilduE4GKRB4NfIkcopMD5f
+    apiUrl: https://api.gtcprojects.com
+    timeout: 2000
+    
+  
+

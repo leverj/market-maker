@@ -1,7 +1,7 @@
-import {getLogger} from './globals'
+import {getLogger} from './logging'
 
 
-describe('logger', () => {
+describe('logging', () => {
   it('use log4js', () => {
     const log = getLogger('test')
     log.trace('hello %s %d %j', 'world', 123, {foo:'bar'}, [1, 2, 3, 4], Object)

@@ -11,15 +11,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/market-maker/staking.git"
+    "url": "git+https://github.com/leverj/market-maker/.git"
   },
   "keywords": [
     "leverj",
     "LEV",
     "trading"
   ],
-  "author": "benny.sadeh@leverj.io",
-  "license": "ISC",
+  "author": "benny@leverj.io",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leverj/market-maker/issues"
+  },
+  "homepage": "https://github.com/leverj/market-maker/#readme",
   "babel": {
     "presets": [
       "node8"
@@ -28,7 +32,7 @@
   },
   "jest": {
     "testMatch": [
-      "**/?(*.)(spec|test).js?(x)"
+      "**/?(*.)(spec|test|it).js?(x)"
     ]
   },
   "devDependencies": {
@@ -38,10 +42,12 @@
     "jest-immutable-matchers": "^1.5.0"
   },
   "dependencies": {
+    "config": "^1.28.1",
     "crypto-js": "^3.1.9-1",
     "decimal.js": "^7.4.0",
     "fetchival": "^0.3.3",
     "immutable": "^3.8.2",
+    "js-yaml": "^3.10.0",
     "log4js": "^2.3.12",
     "node-fetch": "^1.7.3",
     "pubnub": "^4.18.0",

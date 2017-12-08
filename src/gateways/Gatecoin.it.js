@@ -1,4 +1,5 @@
-import {configure, print} from '../common/globals'
+import config from 'config'
+import {print} from '../common/globals'
 import {sleep} from '../common/promises'
 import CurrencyPair from '../domain/CurrencyPair'
 import Order from '../domain/Order'
@@ -8,9 +9,8 @@ import Gatecoin from './Gatecoin'
 /**
  * these tests hit a live Gatecoin api server, so by default they are skipped
  */
-describe.skip('Gatecoin api', () => {
-  const config = configure('application.json').gateways.Gatecoin
-  const gateway = Gatecoin.from(config)
+describe.skip('Gatecoin api integration-test', () => {
+  const gateway = Gatecoin.from(config.get('gateways.Gatecoin'))
   const currencies = CurrencyPair.of('BTC', 'USD')
   // const currencies = CurrencyPair.of('LEV', 'ETH') //>>> Error: [1005] Insufficient funds <<< when attempting to place an error
 
@@ -53,7 +53,7 @@ describe.skip('Gatecoin api', () => {
     }
   })
 
-  it(`<<< NOTE >>> if there's ever a need to cleanup all orders, this is a convenient way to do it`, async () => {
+  it.skip(`<<< NOTE >>> if there's ever a need to cleanup all orders, this is a convenient way to do it`, async () => {
     const orders = await gateway.getCurrentOrdersFor(currencies)
     print(`# of current orders: ${orders.size}`)
     if (!orders.isEmpty())

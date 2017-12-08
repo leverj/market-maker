@@ -1,6 +1,8 @@
+import queue from 'queue'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
-import {getLogger, JobQueue, exceptionHandler} from '../common/globals'
+import {exceptionHandler} from '../common/globals'
+import {getLogger} from '../common/logging'
 import {Lists} from '../common/van_diagrams'
 import CurrencyPair from './CurrencyPair'
 import Order from './Order'
@@ -132,3 +134,16 @@ export const groupByCancelKeepPlace = (currentOrders, futureOrders) => {
     toPlace: vanDiagram.rightOnly
   }
 }
+
+const JobQueue = {
+  fromConfig: (config) => {
+    const {capacity, timeout} = config
+    const q = queue({limit: capacity, timeout: timeout, autostart: true})
+    q.on('success', (result, job) => log.debug('finished processing: %s', jobToString(job)))
+    q.on('error', (e, job) => { log.error('encountered a problem with: %s', jobToString(job), e); throw e })
+    q.on('timeout', (next, job) => { log.error('job timed out: %s', jobToString(job)); next() })
+//    q.on('end', (errors) => log.debug(`DONE :-${errors ? '(' : ')'}`)) //fixme: to be or not to be DONE?
+    return q
+  }
+}
+const jobToString = (job) => job.toString().replace(/\n/g, '')

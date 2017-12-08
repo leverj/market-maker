@@ -1,4 +1,4 @@
-import {getLogger, print} from '../common/globals'
+import {getLogger} from '../common/logging'
 import PubNub from 'pubnub'
 import {TradeSubscriber} from './ExchangeGateway'
 import CurrencyPair from '../domain/CurrencyPair'
@@ -61,19 +61,20 @@ export default class GatecoinPubNubSubscriber extends TradeSubscriber {
 }
 
 
-const log = getLogger('Gatecoin')
+const log = getLogger('Gatecoin.PubNub')
 
-/** returns null if conversion failed */
+/** returns null if irrelevant, or if conversion failed */
 export const tradeFrom = (orderMessage) => {
   try {
     const trade = orderMessage.message
     const {oid, code, side, price, initAmount, remainAmout, status} = trade.order
     if (!CurrencyPair.has(code)) return null // ignore
     if (remainAmout == initAmount) return null // ignore
+    if (status == 1) return null // ignore: 1 = New, 2 = Filling
 
     const timestamp = new Date(trade.stamp * 1000)
     const currencies = CurrencyPair.get(code)
-    const theSide = (side == 0) ? Side.bid : Side.ask
+    const theSide = (side == 0) ? Side.bid : Side.ask // Bid = 0 and Ask = 1
     return Order.of(theSide, initAmount, price, currencies).withRemaining(remainAmout).placeWith(oid, timestamp)
   } catch (e) {
     log.warn('bad trade: %s', orderMessage, e)

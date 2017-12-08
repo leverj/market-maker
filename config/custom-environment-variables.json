@@ -1,0 +1,7 @@
+{
+  "gateways": {
+    "Gatecoin": {
+      "privateKey": "GATECOIN_PRIVATE_KEY"
+    }
+  }
+}

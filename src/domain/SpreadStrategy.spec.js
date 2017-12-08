@@ -1,3 +1,4 @@
+import config from 'config'
 import {List} from 'immutable'
 import SpreadStrategy from './SpreadStrategy'
 import CurrencyPair from "./CurrencyPair"
@@ -8,6 +9,14 @@ describe('Spread Strategy', () => {
   
   it('construct from config', () => {
     const fixed = SpreadStrategy.fromConfig({ type: 'fixed', depth: 3, quantity: 1, step: 0.1 })
+    expect(fixed.depth).toBe(3)
+    expect(fixed.quantity).toBe(1)
+    expect(fixed.step).toBe(0.1)
+  })
+
+  it('construct from config file', () => {
+    const conf = config.get('markets')[0].spread
+    const fixed = SpreadStrategy.fromConfig(conf)
     expect(fixed.depth).toBe(3)
     expect(fixed.quantity).toBe(1)
     expect(fixed.step).toBe(0.1)

@@ -7,7 +7,7 @@ coverage/
 data/
 logs/
 *.log
-config/*.json
+config/secrets/
 
 .idea/
 .DS_Store

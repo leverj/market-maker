@@ -1,3 +1,4 @@
+import config from 'config'
 import CurrencyPair from './CurrencyPair'
 
 
@@ -13,6 +14,11 @@ describe('CurrencyPair', () => {
 
   it('construct from config', () => {
     expect(CurrencyPair.fromConfig({primary: 'LEV', secondary: 'ETH'})).toBe(CurrencyPair.of('LEV', 'ETH'))
+  })
+
+  it('construct from config file', () => {
+    const conf = config.get('markets')[0].currencies
+    expect(CurrencyPair.fromConfig(conf)).toBe(CurrencyPair.of('LEV', 'ETH'))
   })
 
   it('lazyly construct if non exist', () => {
