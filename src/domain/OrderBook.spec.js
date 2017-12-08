@@ -20,7 +20,7 @@ describe('OrderBook', () => {
     it('orders are represented as Map of Maps', () => {
       expect(book.toJS()).toEqual(
       {
-        currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
+        currencies: 'LEVETH',
         orders: {
           'id_1': {
             id: 'id_1',
@@ -29,7 +29,7 @@ describe('OrderBook', () => {
             quantity: 10,
             remaining: 10,
             price: 115,
-            currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
+            currencies: 'LEVETH',
           },
           'id_2': {
             id: 'id_2',
@@ -38,7 +38,7 @@ describe('OrderBook', () => {
             quantity: 10,
             remaining: 10,
             price: 111,
-            currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
+            currencies: 'LEVETH',
           },
           'id_3': {
             id: 'id_3',
@@ -47,7 +47,7 @@ describe('OrderBook', () => {
             quantity: 10,
             remaining: 10,
             price: 109,
-            currencies: { primary: { symbol: 'LEV' }, secondary: { symbol: 'ETH' }, code: 'LEVETH' },
+            currencies: 'LEVETH',
           },
           'id_4': {
             id: 'id_4',
@@ -56,7 +56,7 @@ describe('OrderBook', () => {
             quantity: 10,
             remaining: 10,
             price: 105,
-            currencies: {primary: {symbol: 'LEV'}, secondary: {symbol: 'ETH'}, code: 'LEVETH'},
+            currencies: 'LEVETH',
           }
         }
       })
@@ -76,7 +76,7 @@ describe('OrderBook', () => {
       expect(book.orders.size).toBe(4)
       expect(book.asks.size).toBe(2)
       expect(book.bids.size).toBe(2)
-      expect(book.currenciesCode).toBe('LEVETH')
+      expect(book.currencies.code).toBe('LEVETH')
       expect(book.toString()).toBe('LEVETH OrderBook [4 orders]')
     })
   })

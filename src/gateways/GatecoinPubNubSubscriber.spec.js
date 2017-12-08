@@ -1,21 +1,20 @@
 import CurrencyPair from '../domain/CurrencyPair'
 import {Side} from '../domain/Order'
-import {tradeFrom} from './GatecoinPubNubSubscriber'
+import {orderFrom} from './GatecoinPubNubSubscriber'
 
 
 describe('GatecoinPubNubSubscriber', () => {
-  const currencies = CurrencyPair.of('BTC', 'USD')
-  // const currencies = CurrencyPair.of('LEV', 'ETH')
+  const currencies = CurrencyPair.of('LEV', 'ETH')
   const now = new Date()
   const quantity = 10, price = 110.0
 
-  describe('tradeFrom(message) - converting from PubNub order message (json) to Order', () => {
+  describe('orderFrom(message) - converting from PubNub order message (json) to Order', () => {
     it('converting valid message', () => {
       const message = buildOrderMessage('id-1', now.getTime(), currencies.code, 0, price, quantity, quantity - 3)
-      const order = tradeFrom(message)
+      const order = orderFrom(message)
       expect(order.id).toBe('id-1')
       expect(order.timestamp).toEqual(now)
-      expect(order.currenciesCode).toBe(currencies.code)
+      expect(order.currencies.code).toBe(currencies.code)
       expect(order.side).toBe(Side.bid)
       expect(order.price).toBe(price)
       expect(order.quantity).toBe(10)
@@ -24,17 +23,17 @@ describe('GatecoinPubNubSubscriber', () => {
 
     it('converting message with non-existing currency-pair >>> ignore it', () => {
       const message = buildOrderMessage('id-1', now.getTime(), 'NOCODE', 0, price, quantity, quantity - 3)
-      expect(tradeFrom(message)).toBeNull()
+      expect(orderFrom(message)).toBeNull()
     })
 
     it('remaining == quantity >>> ignore it', () => {
       const message = buildOrderMessage('id-1', now.getTime(), currencies.code, 0, price, quantity, quantity)
-      expect(tradeFrom(message)).toBeNull()
+      expect(orderFrom(message)).toBeNull()
     })
 
     it('converting message with semantically invalid values >>> ignore it', () => {
       const message = buildOrderMessage('id-1', now.getTime(), currencies.code, 0, price, quantity - 3, quantity)
-      expect(tradeFrom(message)).toBeNull()
+      expect(orderFrom(message)).toBeNull()
     })
   })
 

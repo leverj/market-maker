@@ -113,7 +113,7 @@ const log = getLogger('MarketMaker')
 
 const storeInFile = (book) => {
   const filename = new Date().toISOString()
-  const dir = `data/markets/${book.currenciesCode}`
+  const dir = `data/markets/${book.currencies.code}`
   const path = `${dir}/${filename}`
   mkdirp(dir, (e) => {
     if (e) exceptionHandler(e)

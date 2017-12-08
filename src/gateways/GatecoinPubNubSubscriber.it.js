@@ -18,9 +18,7 @@ const callbackResults = Map().asMutable()
 
 describe('GatecoinPubNubSubscriber integration-test', () => {
   const conf = config.get('gateways.Gatecoin')
-  const currencies = CurrencyPair.of('BTC', 'USD')
-  // const currencies = CurrencyPair.of('LEV', 'ETH')
-  const now = new Date()
+  const currencies = CurrencyPair.of('LEV', 'ETH')
   const quantity = 10, price = 110.0
 
   describe.skip('subscription', () => {

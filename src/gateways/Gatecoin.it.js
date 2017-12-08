@@ -11,8 +11,7 @@ import Gatecoin from './Gatecoin'
  */
 describe.skip('Gatecoin api integration-test', () => {
   const gateway = Gatecoin.from(config.get('gateways.Gatecoin'))
-  const currencies = CurrencyPair.of('BTC', 'USD')
-  // const currencies = CurrencyPair.of('LEV', 'ETH') //>>> Error: [1005] Insufficient funds <<< when attempting to place an error
+  const currencies = CurrencyPair.of('LEV', 'ETH')
 
   it('api should be connected', async () => {
     expect(await gateway.isUp())

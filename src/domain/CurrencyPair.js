@@ -12,8 +12,8 @@ export default class CurrencyPair extends ImmutableObject {
     const primary = Currency.of(primarySymbol), secondary = Currency.of(secondarySymbol)
     const code = `${primary.symbol}${secondary.symbol}`
     if (!pairs.has(code)) pairs.set(code, new CurrencyPair(Map({
-      primary: primary.map,
-      secondary: secondary.map,
+      primary: primary.symbol,
+      secondary: secondary.symbol,
       code: code,
     })))
     return this.get(code)
@@ -21,10 +21,10 @@ export default class CurrencyPair extends ImmutableObject {
   static fromConfig(config) { return this.of(Currency.of(config.primary), Currency.of(config.secondary)) }
 
   constructor(map) { super(map) }
-  get primary() { return this.get('primary') }
-  get secondary() { return this.get('secondary') }
+  get primary() { return Currency.of(this.get('primary')) }
+  get secondary() { return Currency.of(this.get('secondary')) }
   get code() { return this.get('code') }
-  toString() { return `${this.getIn(['primary', 'symbol'])}->${this.getIn(['secondary', 'symbol'])}` }
+  toString() { return `${this.primary.symbol}->${this.secondary.symbol}` }
 }
 /* private storage for memoized pairs */
 const pairs = Map().asMutable()

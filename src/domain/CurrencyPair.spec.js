@@ -5,8 +5,8 @@ import CurrencyPair from './CurrencyPair'
 describe('CurrencyPair', () => {
   it('construct from symbols', () => {
     expect(CurrencyPair.of('LEV', 'ETH').toJS()).toEqual({
-      primary: {symbol: 'LEV'},
-      secondary: {symbol: 'ETH'},
+      primary: 'LEV',
+      secondary: 'ETH',
       code: 'LEVETH',
     })
     expect(CurrencyPair.of('LEV', 'ETH').toString()).toEqual('LEV->ETH')

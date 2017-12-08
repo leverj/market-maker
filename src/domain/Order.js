@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {Map} from 'immutable'
 import ImmutableObject from '../common/ImmutableObject'
+import CurrencyPair from './CurrencyPair'
 
 
 /** I start as an intention to trade on an exchange a quantity of a primary currency in terms of a secondary currency.
@@ -13,7 +14,7 @@ export default class Order extends ImmutableObject {
     return new Order(Map({
       id: undefined,
       timestamp: undefined,
-      currencies: currencies.map,
+      currencies: currencies.code,
       side: side,
       price: price,
       quantity: quantity,
@@ -28,15 +29,14 @@ export default class Order extends ImmutableObject {
   constructor(map) { super(map) }
   get id() { return this.map.get('id') }
   get timestamp() { return this.map.get('timestamp') }
-  get currencies() { return this.map.get('currencies') }
+  get currencies() { return CurrencyPair.get(this.get('currencies')) }
   get side() { return this.map.get('side') }
   get price() { return this.map.get('price')}
   get quantity() { return this.map.get('quantity') }
   get remaining() { return this.map.get('remaining') }
-  get currenciesCode() { return this.map.getIn(['currencies', 'code']) }
   toString() {
-    const primary = this.getIn(['currencies', 'primary', 'symbol'])
-    const secondary = this.getIn(['currencies', 'secondary', 'symbol'])
+    const primary = this.currencies.primary.symbol
+    const secondary = this.currencies.secondary.symbol
     return `${this.side} ${this.quantity} ${primary} @ ${this.price} ${secondary} (${this.remaining} remaining)`
   }
   toLongString() { return `${this.toString()} [${this.id} : ${this.timestamp}]` }

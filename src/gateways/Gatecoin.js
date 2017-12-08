@@ -86,7 +86,7 @@ export default class Gatecoin extends ExchangeGateway {
 
   place(order) {
     const parameters = {
-      Code: order.currenciesCode,
+      Code: order.currencies.code,
       Way: order.side,
       Amount: order.quantity,
       Price: order.price,

@@ -18,11 +18,7 @@ describe('Order', () => {
         quantity: 10,
         remaining: 10,
         price: 10.5,
-        currencies: {
-          primary: {symbol: 'LEV'},
-          secondary: {symbol: 'ETH'},
-          code: 'LEVETH'
-        }
+        currencies: 'LEVETH'
       })
     })
 
@@ -35,9 +31,9 @@ describe('Order', () => {
 
   describe('getters & queries', () => {
     it('getters', () => {
-      expect(order.currenciesCode).toBe('LEVETH')
+      expect(order.currencies.code).toBe('LEVETH')
       expect(order.toString()).toBe('Ask 10 LEV @ 10.5 ETH (10 remaining)')
-      expect(order.toLongString()).toMatch(/\[undefined : undefined\]/)
+      expect(order.toLongString()).toMatch(/undefined : undefined/)
     })
     it('queries', () => {
       expect(order.isAsk).toBe(true)
