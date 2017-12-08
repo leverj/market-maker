@@ -1,4 +1,5 @@
 import uuidv4 from 'uuid/v4'
+import {List, Map} from 'immutable'
 import ExchangeGateway, {TradeSubscriber} from '../../gateways/ExchangeGateway'
 import OrderBook from '../../domain/OrderBook'
 import CurrencyPair from "../../domain/CurrencyPair"
@@ -9,6 +10,7 @@ export default class StubbedGateway extends ExchangeGateway {
     super('Playground')
     this.book = OrderBook.of(currencies)
     this.exchangeRate = exchangeRate
+    this.balances = Map(List.of([currencies.primary.symbol, 0],[currencies.secondary.symbol, 0]))
     this.subscriber = null /* subscriber is populated on subscribe(...) call */
   }
 
@@ -19,7 +21,11 @@ export default class StubbedGateway extends ExchangeGateway {
 
   async getCurrentOrdersFor(currencies) { return Promise.resolve(this.book.orders) }
 
+  async getOrder(id) { return Promise.resolve(this.book.getOrder(id)) }
+
   async getLastExchangeRateFor(currencies) { return Promise.resolve(this.exchangeRate) }
+
+  async getBalancesFor(currencies) { return Promise.resolve(this.balances) }
 
   async place(order) {
     return Promise.resolve(() => {

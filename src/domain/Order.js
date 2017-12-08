@@ -57,6 +57,8 @@ export default class Order extends ImmutableObject {
     )
   }
 
+  placeWith(id, timestamp = new Date /* UTC */) { return new Order(this.map.merge({id: id, timestamp: timestamp})) }
+
   withRemaining(remaining) {
     assert(remaining < this.quantity, `remaining=${remaining} must be less then quantity=${this.quantity}`)
     return new Order(this.map.merge({remaining: remaining}))
@@ -66,8 +68,6 @@ export default class Order extends ImmutableObject {
     assert(quantity <= this.remaining, `only ${this.remaining} remaining; ${this.remaining} is too large`)
     return this.withRemaining(this.remaining - quantity)
   }
-
-  placeWith(id, timestamp = new Date /* UTC */) { return new Order(this.map.merge({id: id, timestamp: timestamp})) }
 }
 
 export const Side = {ask: 'Ask', bid: 'Bid'}

@@ -1,6 +1,7 @@
 import {List} from 'immutable'
 import OrderBook from './OrderBook'
 import Order from './Order'
+import Trade from './Trade'
 import CurrencyPair from "./CurrencyPair"
 
 
@@ -78,6 +79,15 @@ describe('OrderBook', () => {
       expect(book.bids.size).toBe(2)
       expect(book.currencies.code).toBe('LEVETH')
       expect(book.toString()).toBe('LEVETH OrderBook [4 orders]')
+    })
+
+    it('ordersApplicableTo(trade)', async () => {
+      const ask = book.asks.first()
+      const bid = book.bids.first()
+      expect(book.ordersApplicableTo(Trade.of(ask.id, bid.id, 'ask', 1, price, currencies, 'tid-1', now))).toEqual(List.of(ask, bid))
+      expect(book.ordersApplicableTo(Trade.of(ask.id, 'none', 'ask', 1, price, currencies, 'tid-1', now))).toEqual(List.of(ask))
+      expect(book.ordersApplicableTo(Trade.of('none', bid.id, 'ask', 1, price, currencies, 'tid-1', now))).toEqual(List.of(bid))
+      expect(book.ordersApplicableTo(Trade.of('what', 'ever', 'ask', 1, price, currencies, 'tid-1', now))).toEqual(List())
     })
   })
 

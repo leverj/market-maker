@@ -1,6 +1,7 @@
 import queue from 'queue'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
+import {List} from 'immutable'
 import {exceptionHandler} from '../common/globals'
 import {getLogger} from '../common/logging'
 import {Lists} from '../common/van_diagrams'
@@ -44,7 +45,7 @@ export default class MarketMaker {
     //fixme: how do we distinguish between 'our' orders and others? (validate that we only get ours from the exchange)
 
     this.trades.stop() // stop processing trades while we update the book
-    this.exchange.subscribe(this.currencies, this.respondTo)
+    this.exchange.subscribe(this.currencies, this.respondTo) //fixme: need to unsubscribe first?
 
     /* establish a book from the exchange */
     const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
@@ -56,11 +57,31 @@ export default class MarketMaker {
     return result
   }
 
-  /** on notification of a trade (for an existing order):
-   * 1. offset the book with the newly traded order
-   * 2. if the order is filled, re-spread the book by applying the spread strategy to it
+  /** on notification of a trade (for existing orders):
+   * 1. merge the book with the newly traded order
+   * 2. if the orders are filled, re-spread the book by applying the spread strategy to it
    */
+  async respondTo_new(trade) {
+    const job = () => new Promise(resolve => {
+      const orders = this.book.ordersApplicableTo(trade)
+      if (orders.isEmpty()) Promise.resolve(this.book)
+      else {
+        const modified = Promise.all(orders.map(each => this.exchange.getOrder(each.id))) //fixme: how to await here?
+        const anyFulfilled = modified.exists(each => each.isFulfilled)
+        Promise.resolve(modified.reduce((book, each) => book.offset(each), this.book)).
+          then(book => anyFulfilled ? this._respread_(book) : book).
+          then(book => this._store_(book))
+      }
+      resolve()
+    })
+    this.trades.push(job)
+  }
+
   async respondTo(order) {
+    return this.respondTo_older(order)
+  }
+
+  async respondTo_older(order) {
     const job = () => new Promise(resolve => {
       if (this.book.hasOrder(order.id)) {
         const currentOrder = this.book.getOrder(order.id)
@@ -102,7 +123,10 @@ export default class MarketMaker {
 
   _store_(book) {
     this.book = book
-    if (this.saveChanges) storeInFile(book)
+    if (this.saveChanges) {
+      const dir = `data/markets/${this.exchange.name}/${book.currencies.code}`
+      storeInFile(book, dir)
+    }
     return book
   }
 
@@ -111,9 +135,8 @@ export default class MarketMaker {
 
 const log = getLogger('MarketMaker')
 
-const storeInFile = (book) => {
+const storeInFile = (book, dir) => { //fixme: test this
   const filename = new Date().toISOString()
-  const dir = `data/markets/${book.currencies.code}`
   const path = `${dir}/${filename}`
   mkdirp(dir, (e) => {
     if (e) exceptionHandler(e)

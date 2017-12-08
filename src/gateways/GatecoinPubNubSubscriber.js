@@ -3,6 +3,7 @@ import PubNub from 'pubnub'
 import {TradeSubscriber} from './ExchangeGateway'
 import CurrencyPair from '../domain/CurrencyPair'
 import Order, {Side} from '../domain/Order'
+import Trade from '../domain/Trade'
 
 
 /**
@@ -11,8 +12,10 @@ import Order, {Side} from '../domain/Order'
  */
 export default class GatecoinPubNubSubscriber extends TradeSubscriber {
 
-  constructor(subscribeKey, channels, callback) {
+  constructor(subscribeKey, currencies, callback) {
+    const channels = [`trade.${currencies.code}`]
     super('Gatecoin.PubNub', channels, callback)
+    this.currencies = currencies
     /*
     this.pubnub = new PubNub({
       uuid: `leverj_${new Date()}`,
@@ -33,7 +36,7 @@ export default class GatecoinPubNubSubscriber extends TradeSubscriber {
       this.verifyConnection()
       this.listener = this.pubnub.addListener({
         message: (tradeMessage) => {
-          const trade = tradeFrom(tradeMessage)
+          const trade = tradeFrom(tradeMessage, this.currencies)
           /* trade is null if conversion failed */
           if (!!trade) this.callback(trade)
         }
@@ -68,37 +71,13 @@ export default class GatecoinPubNubSubscriber extends TradeSubscriber {
 
 const log = getLogger('Gatecoin.PubNub')
 
-export const tradeFrom = (tradeMessage) => {
-/*
-{
-  "trade": {
-    "date": 1512668470,
-    "tid": 55823937,
-    "price": 15617.3,
-    "amount": 0.00011,
-    "askOrderId": "BK11533607488",
-    "bidOrderId": "BK11533607477",
-    "direction": "ask"
-  },
-  "channel": "trade.BTCUSD",
-  "channelName": "trade.BTCUSD",
-  "currency": "USD",
-  "item": "BTC",
-  "stamp": 1512668470
-}
-
- */
+export const tradeFrom = (tradeMessage, currencies) => {
   try {
-    const trade = tradeMessage.message
-    const {oid, code, side, price, initAmount, remainAmout, status} = trade.order
-    if (!CurrencyPair.has(code)) return null // ignore
-    if (remainAmout == initAmount) return null // ignore
-    if (status == 1) return null // ignore: 1 = New, 2 = Filling
-
-    const timestamp = new Date(trade.stamp * 1000)
-    const currencies = CurrencyPair.get(code)
-    const theSide = (side == 0) ? Side.bid : Side.ask // Bid = 0 and Ask = 1
-    return Order.of(theSide, initAmount, price, currencies).withRemaining(remainAmout).placeWith(oid, timestamp)
+    const trade = tradeMessage.message.trade
+    const {askOrderId, bidOrderId, direction, price, amount, tid, date} = trade
+    const timestamp = new Date(date * 1000)
+    const theDirection = (direction.toLowerCase() == 'bid') ? Side.bid : Side.ask
+    return Trade.of(askOrderId, bidOrderId, theDirection, amount, price, currencies, tid, timestamp)
   } catch (e) {
     log.warn('bad trade: %s', tradeMessage, e)
     return null

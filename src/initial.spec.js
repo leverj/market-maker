@@ -10,6 +10,6 @@ describe('initial setup', () => {
     expect(marketMaker.book.orders.size).toBe(0)
     expect(marketMaker.strategy.depth).toBe(3)
     expect(marketMaker.currencies.code).toBe('LEVETH')
-    expect(marketMaker.saveChanges).toBe(true)
+    expect(marketMaker.saveChanges).toBe(false)
   })
 })

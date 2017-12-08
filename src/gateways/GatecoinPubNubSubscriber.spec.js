@@ -1,6 +1,7 @@
 import CurrencyPair from '../domain/CurrencyPair'
 import {Side} from '../domain/Order'
-import {orderFrom} from './GatecoinPubNubSubscriber'
+import {tradeFrom, orderFrom} from './GatecoinPubNubSubscriber'
+import Order from "../domain/Order"
 
 
 describe('GatecoinPubNubSubscriber', () => {
@@ -8,7 +9,24 @@ describe('GatecoinPubNubSubscriber', () => {
   const now = new Date()
   const quantity = 10, price = 110.0
 
-  describe('orderFrom(message) - converting from PubNub order message (json) to Order', () => {
+  describe('tradeFrom(message) - converting from PubNub trade message (json) to Trade', () => {
+    it('converting valid message', () => {
+      const quantityTraded = quantity -1
+      const ask = Order.ask(quantity, price, currencies).placeWith('id-ask-1', now)
+      const bid = Order.ask(quantityTraded, price, currencies).placeWith('id-bid-1', now)
+      const message = buildTradeMessage(ask.id, bid.id, 'ask', quantityTraded, price, currencies, 'id-trade-1', now.getTime())
+      const trade = tradeFrom(message, currencies)
+      expect(trade.ask).toBe(ask.id)
+      expect(trade.bid).toBe(bid.id)
+      expect(trade.direction).toBe(Side.ask)
+      expect(trade.quantity).toBe(quantityTraded)
+      expect(trade.price).toBe(price)
+      expect(trade.currencies).toBe(currencies)
+      expect(trade.id).toBe('id-trade-1')
+    })
+  })
+
+  describe.skip('orderFrom(message) - converting from PubNub order message (json) to Order', () => {
     it('converting valid message', () => {
       const message = buildOrderMessage('id-1', now.getTime(), currencies.code, 0, price, quantity, quantity - 3)
       const order = orderFrom(message)
@@ -39,6 +57,31 @@ describe('GatecoinPubNubSubscriber', () => {
 
 })
 
+const buildTradeMessage = (ask, bid, direction, quantity, price, currencies, id, timestamp) => {
+  const stamp = Math.trunc(timestamp / 1000)
+  return {
+    channel: `trade.${currencies.code}`,
+    actualChannel: null,
+    subscribedChannel: `trade.${currencies.code}`,
+    timetoken: timestamp,
+    message: {
+      trade: {
+        date: stamp,
+        tid: id,
+        price: price,
+        amount: quantity,
+        askOrderId: ask,
+        bidOrderId: bid,
+        direction: direction
+      },
+      channel: `trade.${currencies.code}`,
+      channelName: `trade.${currencies.code}`,
+      currency: currencies.secondary.symbol,
+      item: currencies.primary.symbol,
+      stamp: stamp
+    }
+  }
+}
 
 const buildOrderMessage = (id, timestamp, code, side, price, quantity, remaining) => {
   return {

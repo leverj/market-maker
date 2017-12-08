@@ -17,8 +17,14 @@ import {exceptionHandler} from '../common/globals'
   /** returns a List of pending orders */
   async getCurrentOrdersFor(currencies) { throw new TypeError('Must override method') }
 
+  /** returns the order identified by id */
+  async getOrder(id) { throw new TypeError('Must override method') }
+
   /** returns the last price traded */
   async getLastExchangeRateFor(currencies) { throw new TypeError('Must override method') }
+
+  /** returns current balances for currencies accounts  */
+  async getBalancesFor(currencies) { throw new TypeError('Must override method') }
 
   /** returns the id of the placed order */
   async place(order) { throw new TypeError('Must override method') }
@@ -26,7 +32,7 @@ import {exceptionHandler} from '../common/globals'
   /** returns a success criteria  */
   async cancel(order) { throw new TypeError('Must override method') }
 
-  /** subscribe to onTrade notification using a callback */
+  /** subscribe to trade notification using a callback */
   subscribe(currencies, callback) { throw new TypeError('Must override method') }
 
   /** an opportunity to cleanup resources */

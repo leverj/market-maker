@@ -54,7 +54,7 @@ describe('MarketMaker', () => {
       expect(marketMaker.book.orders.size).toBe(0)
       expect(marketMaker.strategy.depth).toBe(3)
       expect(marketMaker.currencies).toBe(currencies)
-      expect(marketMaker.saveChanges).toBe(true)
+      expect(marketMaker.saveChanges).toBe(false)
     })
   })
 

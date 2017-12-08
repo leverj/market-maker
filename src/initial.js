@@ -6,16 +6,15 @@ import MarketMaker from './domain/MarketMaker'
 import Gatecoin from './gateways/Gatecoin'
 
 
-const gateways = config.get('gateways')
-const chooseGateway = (env) => {
+const chooseGateway = () => {
+  const gateways = config.get('gateways')
+  const env = process.env.NODE_ENV
   switch (env) {
     case 'test': return new StubbedGateway()
-    case 'dev': return new StubbedGateway()
     case 'stage': return Gatecoin.from(gateways)
     case 'production': return Gatecoin.from(gateways)
-    default: throw new Error(`unrecognized environment: ${env}`)
+    default: throw new Error(`unaccounted for environment: ${env}`)
   }
 }
-const exchange = new Exchange(chooseGateway(process.env.NODE_ENV, gateways))
-export const markets = List(config.get('markets'))
-export const makeMarketMakers = () => markets.map(each => MarketMaker.fromConfig(exchange, each))
+const makeExchange = () => new Exchange(chooseGateway())
+export const makeMarketMakers = () => List(config.get('markets')).map(each => MarketMaker.fromConfig(makeExchange(), each))

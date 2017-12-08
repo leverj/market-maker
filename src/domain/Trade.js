@@ -1,25 +1,7 @@
 import {Map} from 'immutable'
 import ImmutableObject from '../common/ImmutableObject'
+import CurrencyPair from "./CurrencyPair"
 
-/*
-{
-  "trade": {
-    "date": 1512668470,
-    "tid": 55823937,
-    "price": 15617.3,
-    "amount": 0.00011,
-    "askOrderId": "BK11533607488",
-    "bidOrderId": "BK11533607477",
-    "direction": "ask"
-  },
-  "channel": "trade.BTCUSD",
-  "channelName": "trade.BTCUSD",
-  "currency": "USD",
-  "item": "BTC",
-  "stamp": 1512668470
-}
-
- */
 
 export default class Trade extends ImmutableObject {
   static of(ask, bid, direction, quantity, price, currencies, id, timestamp) {
@@ -29,7 +11,7 @@ export default class Trade extends ImmutableObject {
       direction: direction,
       quantity: quantity,
       price: price,
-      currencies: currencies.map,
+      currencies: currencies.code,
       id: id,
       timestamp: timestamp
     }))
@@ -41,6 +23,8 @@ export default class Trade extends ImmutableObject {
   get direction() { return this.get('direction') }
   get quantity() { return this.get('quantity') }
   get price() { return this.get('price') }
-  get currencies() { return this.get('currencies') }
-  toString() { return '' }
+  get currencies() { return CurrencyPair.get(this.get('currencies')) }
+  get id() { return this.get('id') }
+  get timestamp() { return this.get('timestamp') }
+  toString() { return `ask ${this.ask} bid ${this.bid} -> ${this.direction} [${this.quantity} at ${this.price}]` }
 }

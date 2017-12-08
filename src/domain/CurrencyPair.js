@@ -25,6 +25,8 @@ export default class CurrencyPair extends ImmutableObject {
   get secondary() { return Currency.of(this.get('secondary')) }
   get code() { return this.get('code') }
   toString() { return `${this.primary.symbol}->${this.secondary.symbol}` }
+
+  contains(symbol) { return this.primary.symbol == symbol || this.secondary.symbol == symbol }
 }
 /* private storage for memoized pairs */
 const pairs = Map().asMutable()

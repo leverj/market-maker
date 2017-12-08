@@ -2,7 +2,7 @@ import config from 'config'
 import {print} from '../common/globals'
 import {sleep} from '../common/promises'
 import CurrencyPair from '../domain/CurrencyPair'
-import Order from '../domain/Order'
+import Order, {Side} from '../domain/Order'
 import Gatecoin from './Gatecoin'
 
 
@@ -17,16 +17,23 @@ describe.skip('Gatecoin api integration-test', () => {
     expect(await gateway.isUp())
   })
 
+  it(`get currently placed orders for ${currencies}`, async () => {
+    const orders = await gateway.getCurrentOrdersFor(currencies)
+    print(`# of current orders: ${orders.size}`)
+    expect(orders.size).toBe(0)
+  })
+
   it(`get live ticker for ${currencies}`, async () => {
     const exchangeRate = await gateway.getLastExchangeRateFor(currencies)
     print(`${currencies} current exchange rate: ${exchangeRate}`)
     expect(exchangeRate).toBeGreaterThan(0)
   })
 
-  it(`get currently placed orders for ${currencies}`, async () => {
-    const orders = await gateway.getCurrentOrdersFor(currencies)
-    print(`# of current orders: ${orders.size}`)
-    expect(orders.size).toBe(0)
+  it(`get balances for ${currencies}`, async () => {
+    const balances = await gateway.getBalancesFor(currencies)
+    print(`${currencies} current balances: ${balances}`)
+    expect(balances.get(currencies.primary.symbol)).toBeGreaterThan(0)
+    expect(balances.get(currencies.secondary.symbol)).toBeGreaterThan(0)
   })
 
   it(`place an order and return its assigned id`, async () => {
@@ -35,6 +42,12 @@ describe.skip('Gatecoin api integration-test', () => {
     const orderId = await gateway.place(order)
     print(`Order [${orderId}] placed`)
     expect(!!orderId).toBe(true)
+
+    const orderFromExchange = await gateway.getOrder(orderId)
+    expect(orderFromExchange.id).toEqual(orderId)
+    expect(orderFromExchange.side).toEqual(Side.ask)
+    expect(orderFromExchange.quantity).toEqual(quantity)
+    expect(orderFromExchange.price).toEqual(price)
 
     // give it some time, then clean up ...
     await sleep(100)

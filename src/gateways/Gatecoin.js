@@ -5,6 +5,7 @@ import fetch from 'node-fetch'
 import {getLogger} from '../common/logging'
 import {withTimeout} from '../common/promises'
 import Order, {Side} from '../domain/Order'
+import CurrencyPair from '../domain/CurrencyPair'
 import ExchangeGateway from './ExchangeGateway'
 import GatecoinPubNubSubscriber from './GatecoinPubNubSubscriber'
 
@@ -57,26 +58,25 @@ export default class Gatecoin extends ExchangeGateway {
       catch(this.exceptionHandler)
   }
 
+  async getOrder(id) {
+    const endpoint = `/Trade/Orders/${id}`
+    const url = `${this.apiUrl}${endpoint}`
+    return this.call(rest(url, this.withOptions('GET', url)).get(), url).
+      then((response) => validate(response) && toOrder(response.order)).
+      catch(this.exceptionHandler)
+  }
+
   async getCurrentOrdersFor(currencies) {
     const endpoint = '/Trade/Orders'
     const url = `${this.apiUrl}${endpoint}`
     return this.call(rest(url, this.withOptions('GET', url)).get(), url).
       then((response) => validate(response) && List(response.orders).
         filter(each => each.code == currencies.code).
-        map(each =>
-          new Order(Map({
-            id: each.clOrderId,
-            timestamp: fromSecondsStringToDate(each.date),
-            currencies: currencies,
-            side: (each.side == 1 ? Side.ask : Side.bid), //fixme: clarify numeric value conversion: ask = 1, bid = ?
-            price: each.price,
-            quantity: each.initialQuantity,
-            remaining: each.remainingQuantity,
-          })))).
+        map(each => toOrder(each))).
       catch(this.exceptionHandler)
   }
 
-  getLastExchangeRateFor(currencies) {
+  async getLastExchangeRateFor(currencies) {
     const endpoint = '/Public/LiveTicker'
     const url = `${this.apiUrl}${endpoint}/${currencies.code}`
     return this.call(rest(url, this.withOptions('GET', url)).get(), url).
@@ -84,7 +84,18 @@ export default class Gatecoin extends ExchangeGateway {
       catch(this.exceptionHandler)
   }
 
-  place(order) {
+  async getBalancesFor(currencies) {
+    const endpoint = '/Balance/Balances'
+    const url = `${this.apiUrl}${endpoint}`
+    return this.call(rest(url, this.withOptions('GET', url)).get(), url).
+      then((response) => validate(response) && List(response.balances).
+        filter(each => currencies.contains(each.currency)).
+        map(each => [each.currency, each.availableBalance])).
+      then(pairs => Map(pairs)).
+      catch(this.exceptionHandler)
+  }
+
+  async place(order) {
     const parameters = {
       Code: order.currencies.code,
       Way: order.side,
@@ -98,7 +109,7 @@ export default class Gatecoin extends ExchangeGateway {
       catch(this.exceptionHandler)
   }
 
-  cancel(order) {
+  async cancel(order) {
     const endpoint = '/Trade/Orders'
     const url = `${this.apiUrl}${endpoint}/${order.id}`
     return this.call(rest(url, this.withOptions('DELETE', url)).delete(), url).
@@ -107,8 +118,7 @@ export default class Gatecoin extends ExchangeGateway {
   }
 
   subscribe(currencies, callback) {
-    const channels = [`order.${currencies.code}`]
-    this.subscriber = new GatecoinPubNubSubscriber(this.subscribeKey, channels, callback)
+    this.subscriber = new GatecoinPubNubSubscriber(this.subscribeKey, currencies, callback)
   }
 
   shutdown() { if (this.subscriber) this.subscriber.shutdown() }
@@ -120,6 +130,18 @@ const log = getLogger('Gatecoin')
 const toQueryString = (parameters) => Map(parameters).map((v,k) => `${k}=${v}`).join('&')
 
 const fromSecondsStringToDate = (seconds) => new Date(seconds * 1000)
+
+const toOrder = (item) => {
+  return new Order(Map({
+    id: item.clOrderId,
+    timestamp: fromSecondsStringToDate(item.date),
+    currencies: CurrencyPair.get(item.code),
+    side: (item.side == 1 ? Side.ask : Side.bid),  // Bid = 0 and Ask = 1
+    price: item.price,
+    quantity: item.initialQuantity,
+    remaining: item.remainingQuantity,
+  }))
+}
 
 const validate = (response) => isOK(response) ? true : throwError(response)
 const isOK = (response) => response.responseStatus.message == 'OK'

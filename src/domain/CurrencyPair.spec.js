@@ -1,5 +1,6 @@
 import config from 'config'
 import CurrencyPair from './CurrencyPair'
+import Currency from "./Currency"
 
 
 describe('CurrencyPair', () => {
@@ -26,5 +27,13 @@ describe('CurrencyPair', () => {
     expect(CurrencyPair.of('Source', 'Target').toString()).toEqual('Source->Target')
     expect(CurrencyPair.get('SourceTarget')).toBeDefined()
     expect(CurrencyPair.get('SourceTarget')).toBe(CurrencyPair.of('Source', 'Target'))
+  })
+
+  it('contains', () => {
+    const currencies = CurrencyPair.of('LEV', 'ETH')
+    expect(currencies.contains('LEV')).toBe(true)
+    expect(currencies.contains('ETH')).toBe(true)
+    expect(currencies.contains('')).toBe(false)
+    expect(currencies.contains('CRAP_' + +new Date())).toBe(false)
   })
 })

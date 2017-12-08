@@ -25,22 +25,26 @@ export default class OrderBook extends ImmutableObject {
   get size() { return this.get('orders').size }
   toString() { return `${this.currencies.code} OrderBook [${this.size} orders]` }
 
-  getOrder(id) { return new Order(this.getIn(['orders', id])) }
+  getOrder(id) { return this.hasOrder(id) ? new Order(this.getIn(['orders', id])) : null }
   hasOrder(id) { return this.hasIn(['orders', id]) }
 
-  offset(trade) {
-    assert(this.hasOrder(trade.id), `can only offset an existing order: ${trade}`)
-    const existingOrder = this.getOrder(trade.id)
-    assert(existingOrder.isRelatedTo(trade), `can only offset a related order \n\t${existingOrder}\n\t${trade}`)
-    return trade.isFulfilled ?
+  offset(order) {
+    assert(this.hasOrder(order.id), `can only offset an existing order: ${order}`)
+    const existingOrder = this.getOrder(order.id)
+    assert(existingOrder.isRelatedTo(order), `can only offset a related order \n\t${existingOrder}\n\t${order}`)
+    return order.isFulfilled ?
       this.without(existingOrder) :
-      this.mergeWith(trade)
+      this.mergeWith(order)
   }
 
   without(order) { return new OrderBook(this.map.deleteIn(['orders', order.id])) }
   mergeWith(order) { return this.hasOrder(order.id) ?  this.modify(order) : this.add(order)}
   add(order) { return new OrderBook(this.map.setIn(['orders', order.id], order.map)) }
   modify(order) { return new OrderBook(this.map.setIn(['orders', order.id, 'remaining'], order.remaining)) }
+
+  ordersApplicableTo(trade) {
+    return List([this.getOrder(trade.ask), this.getOrder(trade.bid)]).filter(each => !!each)
+  }
 }
 
 
