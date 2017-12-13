@@ -9,8 +9,8 @@ export const exceptionHandler = (e) => {
 }
 
 
-const ops = getLogger('ops-notifications')
-export const notifyOps = (message) => ops.warn(message) //fixme: need to  use a slack or smtp logging transport
+const ops = getLogger('ops')
+export const notifyOps = (message) => ops.warn(message) //fixme: need to use a slack or smtp logging transport
 
 
 export const printJson = (value) => print(JSON.stringify(value, null, 2))

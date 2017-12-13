@@ -1,6 +1,18 @@
 machine:
   node:
-    version: 6.9.1
-dependencies:
-  cache_directories:
-    - "node_modules"
+    version: 8.9.1
+  services:
+    - docker
+
+test:
+  override:
+    - npm test
+
+deployment:
+  hub:
+    branch: dev
+    commands:
+      - docker info
+      - docker build -t leverj/market-maker:dev .
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push leverj/market-maker
