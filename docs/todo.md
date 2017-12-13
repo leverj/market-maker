@@ -7,16 +7,13 @@
   - github build badges
   - docker image
   - bake build info (version/hash/tag ...) with build process
-  - incorporate source maps
 
 
 ## production
 - consider getting rid of:
-  - bubble
   - promise.then
 - logging configuration using log4js
-  - rotating log files 
-  - using ELK
+  - ... now using rotating log files. use ELK (logstash)
 - exception handling 
   - go over what to handle and how (warn -> error -> fatal)
 - notification for ops 
@@ -27,6 +24,5 @@
   - graphana + prometheus
 - Gatecoin
   - production site keys
-  - trading account(2) with money (LEV ? ETH)
-- npm `start` script not suitable for production (bubble)
+  - trading accounts with LEV & ETH balances
  

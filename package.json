@@ -4,10 +4,15 @@
   "description": "market maker for LEV via Getcoin",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node index.js",
+    "start": "node lib/index.js",
+    "start-babelling": "babel-node src/index.js",
     "test": "jest --watch",
-    "build": "babel src/ -d lib/",
-    "prepublish": "npm run build"
+    "prepublish": "npm run clean && npm run build",
+    "_postpublish": "find lib -name ?(*.)(spec|test|it).js?(.*) -delete ",
+    "clean": "rm -rf lib",
+    "version:patch": "npm version patch",
+    "build": "babel src --out-dir lib --source-maps --plugins source-map-support",
+    "build:watch": "babel src --out-dir lib --source-maps --plugins source-map-support --watch"
   },
   "repository": {
     "type": "git",
@@ -27,12 +32,11 @@
   "babel": {
     "presets": [
       "node8"
-    ],
-    "sourceMaps": true
+    ]
   },
   "jest": {
     "testMatch": [
-      "**/?(*.)(spec|test|it).js?(x)"
+      "**/?(*.)(spec|test|it).js"
     ]
   },
   "devDependencies": {
@@ -42,6 +46,8 @@
     "jest-immutable-matchers": "^1.5.0"
   },
   "dependencies": {
+    "babel-plugin-source-map-support": "^1.0.0",
+    "babel-polyfill": "^6.26.0",
     "config": "^1.28.1",
     "crypto-js": "^3.1.9-1",
     "decimal.js": "^7.4.0",
@@ -52,6 +58,7 @@
     "node-fetch": "^1.7.3",
     "pubnub": "^4.18.0",
     "queue": "^4.4.2",
-    "slack-node": "^0.1.8"
+    "slack-node": "^0.1.8",
+    "source-map-support": "^0.5.0"
   }
 }

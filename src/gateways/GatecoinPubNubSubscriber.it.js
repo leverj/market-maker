@@ -21,7 +21,7 @@ const orders = List().asMutable()
  * these tests hit a live Gatecoin api server, so by default they are skipped
  */
 describe.skip('GatecoinPubNubSubscriber integration-test', () => {
-  const quantity = 10, price = 110.1
+  const quantity = 10, price = 10.1
   const currencies = CurrencyPair.of('LEV', 'ETH')
   const exchange = new Exchange(Gatecoin.from(config.get('gateways.Gatecoin')))
   // const subscriber = new GatecoinPubNubSubscriber(config.get('gateways.Gatecoin.subscribeKey'), currencies, callback)

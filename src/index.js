@@ -1,15 +1,13 @@
 import {makeMarketMakers} from './initial'
-import {notifyOps} from './common/globals'
-import config from 'config'
+import {notifyOps, exceptionHandler} from './common/globals'
 
-makeMarketMakers().map(each => each.synchronize())
+const makers = makeMarketMakers()
+makers.map(each => each.synchronize().catch(e => {
+  console.warn(`houston we have a problem`, e)
+})) //fixme: these are promises
 
-const markets = config.get('markets').map(each => each.currencies).map(each => `${each.primary}/${each.secondary}`)
-const message = `starting market makers for currencies: \n\t${markets.join('\n\t')}`
+const message = `starting market makers for currencies:\n   ${makers.map(each => each.currencies).join(', ')}`
 switch (process.env.NODE_ENV) {
   case 'production': notifyOps(message)
   default: console.info(message)
 }
-
-
-

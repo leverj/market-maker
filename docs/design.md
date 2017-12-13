@@ -49,6 +49,6 @@
 * place orders for an initial spread (question: what should be the initial exchange rate?)
 * ad infinitum, listen to LEV<->ETH trade notifications
 * on trade notification:
-  * update order in (internal) OrderBook
-  * if an order is fulfilled (ie: quantity = 0), shift the spread accordingly (up or down) 
+  * update orders in (internal) OrderBook
+  * if any order is fulfilled (ie: quantity = 0), shift the spread accordingly (up or down) 
   by a combination of canceling and placing new orders to maintain the intended spread around the **new** last traded price

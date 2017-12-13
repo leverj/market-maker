@@ -1,7 +1,6 @@
 import queue from 'queue'
 import fs from 'fs'
 import mkdirp from 'mkdirp'
-import {List} from 'immutable'
 import {exceptionHandler} from '../common/globals'
 import {getLogger} from '../common/logging'
 import {Lists} from '../common/van_diagrams'

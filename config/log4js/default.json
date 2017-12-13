@@ -1,0 +1,12 @@
+{
+  "appenders": {
+    "out": { "type": "stdout" },
+    "err": { "type": "stderr" },
+    "everything": { "type": "dateFile", "filename": "logs/application.log", "pattern": ".yyyy-MM-dd-hh", "compress": true, "daysToKeep": 14 },
+    "ops": { "type": "dateFile", "filename": "logs/ops.log", "daysToKeep": 14 },
+    "just-ops": { "type": "logLevelFilter", "appender": "ops", "level": "error" }
+  },
+  "categories": {
+    "default": { "appenders": [ "everything" ], "level": "info" }
+  }
+}
