@@ -43,7 +43,7 @@ describe('Order', () => {
 
       expect(order.isNew).toBe(true)
       expect(order.isPartial).toBe(false)
-      expect(order.isFulfilled).toBe(false)
+      expect(order.isExecuted).toBe(false)
     })
   })
 
@@ -57,7 +57,7 @@ describe('Order', () => {
       expect(placed.isPlaced).toBe(true)
       expect(placed.isNew).toBe(true)
       expect(placed.isPartial).toBe(false)
-      expect(placed.isFulfilled).toBe(false)
+      expect(placed.isExecuted).toBe(false)
 
       const partial = placed.less(1)
       expect(partial.id).toBeDefined()
@@ -65,7 +65,7 @@ describe('Order', () => {
       expect(partial.isPlaced).toBe(true)
       expect(partial.isNew).toBe(false)
       expect(partial.isPartial).toBe(true)
-      expect(partial.isFulfilled).toBe(false)
+      expect(partial.isExecuted).toBe(false)
 
       const fulfilled = placed.less(order.quantity)
       expect(fulfilled.id).toBeDefined()
@@ -73,7 +73,7 @@ describe('Order', () => {
       expect(fulfilled.isPlaced).toBe(true)
       expect(fulfilled.isNew).toBe(false)
       expect(fulfilled.isPartial).toBe(false)
-      expect(fulfilled.isFulfilled).toBe(true)
+      expect(fulfilled.isExecuted).toBe(true)
     })
 
     it('an order is placed by assigning id', () => {

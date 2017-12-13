@@ -1,8 +1,8 @@
 import uuidv4 from 'uuid/v4'
 import {List, Map} from 'immutable'
-import ExchangeGateway, {TradeSubscriber} from '../../gateways/ExchangeGateway'
-import OrderBook from '../../domain/OrderBook'
-import CurrencyPair from "../../domain/CurrencyPair"
+import ExchangeGateway, {TradeSubscriber} from './ExchangeGateway'
+import OrderBook from '../domain/OrderBook'
+import CurrencyPair from "../domain/CurrencyPair"
 
 
 export default class StubbedGateway extends ExchangeGateway {

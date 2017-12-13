@@ -144,12 +144,12 @@ describe('OrderBook', () => {
       const before = book
       const existing = before.getOrder(id)
       const partial = decrement(existing, 1)
-      expect(partial.isFulfilled).toBe(false)
+      expect(partial.isExecuted).toBe(false)
 
       const after = before.offset(partial)
       expect(after.hasOrder(id)).toBe(true)
       expect(after.size).toBe(before.size)
-      expect(after.getOrder(id).isFulfilled).toBe(false)
+      expect(after.getOrder(id).isExecuted).toBe(false)
       expect(after.getOrder(id).remaining).toBe(9)
     })
 
@@ -158,7 +158,7 @@ describe('OrderBook', () => {
       const before = book
       const existing = before.getOrder(id)
       const filled = decrement(existing, existing.remaining)
-      expect(filled.isFulfilled).toBe(true)
+      expect(filled.isExecuted).toBe(true)
 
       const after = before.offset(filled)
       expect(after.hasOrder(id)).toBe(false)

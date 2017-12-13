@@ -1,7 +1,7 @@
 import config from 'config'
 import * as matchers from 'jest-immutable-matchers'
 import Exchange from './Exchange'
-import StubbedGateway from '../common/test_helpers/StubbedGateway'
+import StubbedGateway from '../gateways/StubbedGateway'
 import {sleep} from '../common/promises'
 import SpreadStrategy from './SpreadStrategy'
 import CurrencyPair from './CurrencyPair'
@@ -124,7 +124,7 @@ describe('MarketMaker', () => {
       const trade = order.less(order.quantity)
       expect(order.remaining).toBe(2)
       expect(trade.remaining).toBe(0)
-      expect(trade.isFulfilled).toBe(true)
+      expect(trade.isExecuted).toBe(true)
 
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
       await marketMaker.respondTo(trade)

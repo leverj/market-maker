@@ -1,5 +1,5 @@
 import StubbedGateway from './StubbedGateway'
-import CurrencyPair from "../../domain/CurrencyPair"
+import CurrencyPair from "../domain/CurrencyPair"
 
 
 describe('simulating subscribe triggering registered callback', () => {

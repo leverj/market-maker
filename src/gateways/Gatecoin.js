@@ -18,7 +18,7 @@ const rest = fetchival
  */
 export default class Gatecoin extends ExchangeGateway {
   static from(config) {
-    const {apiUrl, privateKey, publicKey, subscribeKey, timeout} = config
+    const {privateKey, publicKey, subscribeKey, apiUrl, timeout} = config
     return new Gatecoin(apiUrl, privateKey, publicKey, subscribeKey, timeout)
   }
 

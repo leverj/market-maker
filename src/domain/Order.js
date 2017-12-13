@@ -45,8 +45,8 @@ export default class Order extends ImmutableObject {
   get isAsk() { return this.side == Side.ask }
   get isPlaced() { return !!(this.id) }
   get isNew() { return this.quantity == this.remaining }
-  get isFulfilled() { return this.remaining == 0 }
-  get isPartial() { return !this.isNew && !this.isFulfilled }
+  get isExecuted() { return this.remaining == 0 }
+  get isPartial() { return !this.isNew && !this.isExecuted }
   isRelatedTo(that) { return this.isLike(that) && this.id == that.id }
   isLike(that) {
     return (

@@ -32,6 +32,7 @@ class FixedSpread extends SpreadStrategy {
   }
 
   applyTo(price, currencies) {
+    assert(price - (this.depth * this.step) > 0, `${price} : price is too low`)
     const precision = decimalPlaces(price)
     return Range(1, this.depth + 1).flatMap(i =>
       List.of(

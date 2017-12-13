@@ -66,7 +66,7 @@ export default class MarketMaker {
       if (orders.isEmpty()) Promise.resolve(this.book)
       else {
         const modified = Promise.all(orders.map(each => this.exchange.getOrder(each.id))) //fixme: how to await here?
-        const anyFulfilled = modified.exists(each => each.isFulfilled)
+        const anyFulfilled = modified.exists(each => each.isExecuted)
         Promise.resolve(modified.reduce((book, each) => book.offset(each), this.book)).
           then(book => anyFulfilled ? this._respread_(book) : book).
           then(book => this._store_(book))
@@ -86,7 +86,7 @@ export default class MarketMaker {
         const currentOrder = this.book.getOrder(order.id)
         if (currentOrder.isRelatedTo(order)) {
           Promise.resolve(this.book.offset(order)).
-            then(book => order.isFulfilled ? this._respread_(book) : book).
+            then(book => order.isExecuted ? this._respread_(book) : book).
             then(book => this._store_(book))
         } else Promise.resolve(this.book)
       } else Promise.resolve(this.book)

@@ -1,6 +1,6 @@
 import Exchange from './Exchange'
 import CurrencyPair from "./CurrencyPair"
-import StubbedGateway from "../common/test_helpers/StubbedGateway"
+import StubbedGateway from "../gateways/StubbedGateway"
 
 
 describe('Exchange', () => {
