@@ -14,6 +14,7 @@ markets:
 gateways:
   Gatecoin: 
     publicKey: jUCWb9WNrNilduE4GKRB4NfIkcopMD5f
+    subscribeKey: sub-c-41ecad08-6f65-11e6-83fa-0619f8945a4f
     apiUrl: https://api.gtcprojects.com
     timeout: 2000
     

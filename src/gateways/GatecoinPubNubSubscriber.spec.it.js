@@ -24,13 +24,13 @@ describe.skip('GatecoinPubNubSubscriber integration-test', () => {
   const quantity = 10, price = 10.1
   const currencies = CurrencyPair.of('LEV', 'ETH')
   const exchange = new Exchange(Gatecoin.from(config.get('gateways.Gatecoin')))
-  // const subscriber = new GatecoinPubNubSubscriber(config.get('gateways.Gatecoin.subscribeKey'), currencies, callback)
+  const subscriber = new GatecoinPubNubSubscriber(config.get('gateways.Gatecoin.subscribeKey'), currencies, callback)
 
   afterEach(() => callbackResults.clear())
 
   afterAll(async () => {
     if (!!subscriber) subscriber.shutdown()
-    // await Promise.all(orders.map(each => exchange.cancel(each)))
+    await Promise.all(orders.map(each => exchange.cancel(each)))
   })
 
   it('subscription - callback is called on proper trade', async () => {
@@ -40,12 +40,11 @@ describe.skip('GatecoinPubNubSubscriber integration-test', () => {
     const bid = await exchange.place(Order.bid(1, price, currencies))
     orders.push(ask, bid)
     orders.forEach(each => print(`placed: ${each.toLongString()}`))
-    // await sleep(10000) //give time for the orders to get published, and the trade to happen
+    await sleep(9000) //give time for the orders to get published, and the trade to happen
 
-    // expect(callbackResults.isEmpty()).toBe(false)
-    // expect(callbackResults.has(order.id)).toBe(true)
-  })
-  // }, 15000)
+    expect(callbackResults.isEmpty()).toBe(false)
+    expect(callbackResults.has(order.id)).toBe(true)
+  }, 10000)
 
   it('callback is ignore on improper trade', async () => {
     expect(callbackResults.isEmpty()).toBe(true)

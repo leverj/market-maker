@@ -15,6 +15,6 @@ gateways:
   Gatecoin:
     privateKey: "must be provided via environment variable GATECOIN_PRIVATE_KEY"
     publicKey: missing
-    subscribeKey: sub-c-ee68e350-4ef7-11e6-bfbb-02ee2ddab7fe
+    subscribeKey: missing
     apiUrl: https://api.gatecoin.com
     timeout: 1000

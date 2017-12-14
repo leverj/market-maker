@@ -5,16 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node lib/index.js",
-    "test": "jest --watch",
-    "prepublish": "npm run clean && npm run build",
     "start:test": "cross-env NODE_ENV=test node lib/index",
     "start:prod": "cross-env NODE_ENV=production node lib/index",
     "start:pm:test": "cross-env NODE_ENV=test pm2 start lib/index && pm2 logs",
     "start:pm:prod": "cross-env NODE_ENV=production pm2 start lib/index && pm2 logs",
+    "test": "jest --watch",
+    "prepublish": "npm run clean && npm run build",
     "clean": "rimraf lib",
-    "version:patch": "npm version patch",
-    "build": "babel src --out-dir lib --source-maps",
-    "build:watch": "babel src --out-dir lib --source-maps --watch"
+    "build": "babel src --out-dir lib --ignore .spec. --source-maps",
+    "build:watch": "babel src --out-dir lib --ignore .spec. --source-maps --watch",
+    "version:patch": "npm version patch"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,10 @@
     "url": "https://github.com/leverj/market-maker/issues"
   },
   "homepage": "https://github.com/leverj/market-maker/#readme",
+  "babel": {
+    "presets": [ "node8" ],
+    "plugins": [ "source-map-support" ]
+  },
   "jest": {
     "testMatch": [
       "**/src/**/?(*.)(spec|test|it).js"
