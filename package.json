@@ -8,11 +8,10 @@
     "start-babelling": "babel-node src/index.js",
     "test": "jest --watch",
     "prepublish": "npm run clean && npm run build",
-    "_postpublish": "find lib -name ?(*.)(spec|test|it).js?(.*) -delete ",
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib",
     "version:patch": "npm version patch",
-    "build": "babel src --out-dir lib --source-maps --plugins source-map-support",
-    "build:watch": "babel src --out-dir lib --source-maps --plugins source-map-support --watch"
+    "build": "babel src --out-dir lib --source-maps",
+    "build:watch": "babel src --out-dir lib --source-maps --watch"
   },
   "repository": {
     "type": "git",
@@ -29,11 +28,6 @@
     "url": "https://github.com/leverj/market-maker/issues"
   },
   "homepage": "https://github.com/leverj/market-maker/#readme",
-  "babel": {
-    "presets": [
-      "node8"
-    ]
-  },
   "jest": {
     "testMatch": [
       "**/src/**/?(*.)(spec|test|it).js"
@@ -43,7 +37,8 @@
     "babel-cli": "^6.26.0",
     "babel-preset-node8": "^1.2.0",
     "jest": "^21.2.1",
-    "jest-immutable-matchers": "^1.5.0"
+    "jest-immutable-matchers": "^1.5.0",
+    "pm2": "^2.8.0"
   },
   "dependencies": {
     "babel-plugin-source-map-support": "^1.0.0",

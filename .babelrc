@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "node8"
+  ],
+  "ignore": [
+    "**/*.test.js",
+    "**/*.spec.js",
+    "**/*.it.js"
+  ],
+  "plugins": [
+    "source-map-support"
+  ]
+}
