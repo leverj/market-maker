@@ -110,7 +110,7 @@ describe('MarketMaker', () => {
       const trade = order.less(1)
       expect(order.remaining).toBe(2)
       expect(trade.remaining).toBe(1)
-      expect(trade.isPartial).toBe(true)
+      expect(trade.isFilling).toBe(true)
 
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
       await marketMaker.respondTo(trade)
@@ -124,7 +124,7 @@ describe('MarketMaker', () => {
       const trade = order.less(order.quantity)
       expect(order.remaining).toBe(2)
       expect(trade.remaining).toBe(0)
-      expect(trade.isExecuted).toBe(true)
+      expect(trade.isFilled).toBe(true)
 
       expect(marketMaker.book.getOrder(order.id).remaining).toBe(2)
       await marketMaker.respondTo(trade)

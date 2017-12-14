@@ -32,7 +32,7 @@ export default class OrderBook extends ImmutableObject {
     assert(this.hasOrder(order.id), `can only offset an existing order: ${order}`)
     const existingOrder = this.getOrder(order.id)
     assert(existingOrder.isRelatedTo(order), `can only offset a related order \n\t${existingOrder}\n\t${order}`)
-    return order.isExecuted ?
+    return order.isFilled ?
       this.without(existingOrder) :
       this.mergeWith(order)
   }

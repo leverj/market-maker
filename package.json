@@ -36,7 +36,7 @@
   },
   "jest": {
     "testMatch": [
-      "**/?(*.)(spec|test|it).js"
+      "**/src/**/?(*.)(spec|test|it).js"
     ]
   },
   "devDependencies": {
