@@ -1,0 +1,6 @@
+config/
+docs/
+lib/
+logs/
+node_modules/
+src/

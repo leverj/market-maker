@@ -6,13 +6,21 @@ machine:
 
 test:
   override:
+    - npm install
     - npm test
+    - npm run dist
 
 deployment:
   hub:
-    branch: dev
+    branch: develop
     commands:
       - docker info
-      - docker build -t leverj/market-maker:dev .
+      - docker build -t leverj/market-maker:develop .
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push leverj/market-maker
+    branch: master
+    commands:
+      - docker info
+      - docker build -t leverj/market-maker:livenet .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push leverj/market-maker
