@@ -4,18 +4,21 @@
   "description": "market maker for LEV via Getcoin",
   "main": "index.js",
   "scripts": {
-    "start": "node lib/index.js",
+    "start": "node lib/index",
     "start:test": "cross-env NODE_ENV=test node lib/index",
     "start:prod": "cross-env NODE_ENV=production node lib/index",
     "start:pm:test": "cross-env NODE_ENV=test pm2 start lib/index && pm2 logs",
     "start:pm:prod": "cross-env NODE_ENV=production pm2 start lib/index && pm2 logs",
+
     "test": "jest",
     "test:watch": "jest --watch",
-    "_prepublish": "npm run clean && npm run build",
-    "clean": "rimraf lib",
-    "build": "babel src --out-dir lib --ignore .spec. --source-maps",
+
+    "build": "rimraf lib && babel src --out-dir lib --ignore .spec. --source-maps",
     "build:watch": "babel src --out-dir lib --ignore .spec. --source-maps --watch",
-    "dist": "rimraf dist && mkdir dist && rimraf lib && npm run build && cp -r lib config package.json package-lock.json dist/",
+
+    "dist": "rimraf dist && npm run build && npm run dist:copy",
+    "dist:copy": "mkdir dist && cp -r lib config package.json package-lock.json dist/",
+
     "version:patch": "npm version patch"
   },
   "repository": {

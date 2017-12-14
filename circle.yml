@@ -4,13 +4,9 @@ machine:
   services:
     - docker
 
-test:
-  override:
-    - npm install
-    - npm test
-    - npm run dist
-
 deployment:
+  pre:
+    - npm run dist
   hub:
     branch: develop
     commands:
