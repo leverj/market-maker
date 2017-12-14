@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node lib/index.js",
-    "start-babelling": "babel-node src/index.js",
     "test": "jest --watch",
     "prepublish": "npm run clean && npm run build",
+    "start:test": "cross-env NODE_ENV=test node lib/index",
+    "start:prod": "cross-env NODE_ENV=production node lib/index",
+    "start:pm:test": "cross-env NODE_ENV=test pm2 start lib/index && pm2 logs",
+    "start:pm:prod": "cross-env NODE_ENV=production pm2 start lib/index && pm2 logs",
     "clean": "rimraf lib",
     "version:patch": "npm version patch",
     "build": "babel src --out-dir lib --source-maps",
@@ -36,6 +39,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-node8": "^1.2.0",
+    "cross-env": "^5.1.1",
     "jest": "^21.2.1",
     "jest-immutable-matchers": "^1.5.0",
     "pm2": "^2.8.0"
