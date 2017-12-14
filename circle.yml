@@ -18,6 +18,7 @@ deployment:
       - docker build -t leverj/market-maker:develop .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push leverj/market-maker
+  master:
     branch: master
     commands:
       - docker info
