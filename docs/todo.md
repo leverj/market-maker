@@ -4,8 +4,6 @@
 
 ## build
 - CircleCI integration 
-  - github build badges
-  - docker image
   - bake build info (version/hash/tag ...) with build process
 
 
@@ -20,9 +18,6 @@
   - configure and enable via log4js transports: smtp, slack, ... ?
 - integrate a monitoring solution
   - rancherOS
-  - ps2
+  - pm2
   - graphana + prometheus
-- Gatecoin
-  - production site keys
-  - trading accounts with LEV & ETH balances
  
