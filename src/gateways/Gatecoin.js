@@ -7,7 +7,7 @@ import {withTimeout} from '../common/promises'
 import Order, {Side} from '../domain/Order'
 import CurrencyPair from '../domain/CurrencyPair'
 import ExchangeGateway from './ExchangeGateway'
-import GatecoinPubNubSubscriber from './GatecoinPubNubSubscriber'
+import GatecoinTickerSubscriber from './GatecoinTickerSubscriber'
 
 fetchival.fetch = fetch
 const rest = fetchival
@@ -17,17 +17,15 @@ const rest = fetchival
  * see: https://api.gatecoin.com/swagger-ui/index.html
  */
 export default class Gatecoin extends ExchangeGateway {
-  static from(config) {
-    const {privateKey, publicKey, subscribeKey, apiUrl, timeout} = config
-    return new Gatecoin(apiUrl, privateKey, publicKey, subscribeKey, timeout)
-  }
+  static from(config) { return new Gatecoin(config) }
 
-  constructor(apiUrl, privateKey, publicKey, subscribeKey, timeout) {
+  constructor(config) {
     super('Gatecoin')
+    this.config = config
+    const {privateKey, publicKey, apiUrl, timeout} = config
     this.apiUrl = apiUrl
     this.privateKey = privateKey
     this.publicKey = publicKey
-    this.subscribeKey = subscribeKey
     this.timeout = timeout
     if (!this.isUp()) log.fatal(`${this} ${apiUrl} api is offline :-(`)
   }
@@ -118,7 +116,8 @@ export default class Gatecoin extends ExchangeGateway {
   }
 
   subscribe(currencies, callback) {
-    this.subscriber = new GatecoinPubNubSubscriber(this.subscribeKey, currencies, callback)
+    this.shutdown()
+    this.subscriber = GatecoinTickerSubscriber.from(this.apiUrl, currencies, this.config.pollingInterval, callback)
   }
 
   shutdown() { if (this.subscriber) this.subscriber.shutdown() }

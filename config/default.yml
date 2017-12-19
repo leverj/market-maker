@@ -4,10 +4,11 @@ markets:
       secondary: ETH
     spread:
       type: fixed
+      precision: 9
       depth: 5
       quantity: 10000
       step: 0.00001
-    trades:
+    jobs:
       limit: 100
       timeout: 1000
     save_changes: true
@@ -18,3 +19,4 @@ gateways:
     subscribeKey: missing
     apiUrl: https://api.gatecoin.com
     timeout: 1000
+    pollingInterval: 60000

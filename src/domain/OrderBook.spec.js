@@ -117,7 +117,7 @@ describe('OrderBook', () => {
       const before = book
       expect(before.hasOrder('id_1'))
 
-      const toBeUpdated = decrement(before.getOrder('id_1'), 1)
+      const toBeUpdated = before.getOrder('id_1').less(1)
       const after = before.mergeWith(toBeUpdated)
       expect(after.hasOrder('id_1')).toBe(true)
       const updated = after.getOrder('id_1')
@@ -143,7 +143,7 @@ describe('OrderBook', () => {
       const id = 'id_1'
       const before = book
       const existing = before.getOrder(id)
-      const partial = decrement(existing, 1)
+      const partial = existing.less(1)
       expect(partial.isFilled).toBe(false)
 
       const after = before.offset(partial)
@@ -157,7 +157,7 @@ describe('OrderBook', () => {
       const id = 'id_1'
       const before = book
       const existing = before.getOrder(id)
-      const filled = decrement(existing, existing.remaining)
+      const filled = existing.less(existing.remaining)
       expect(filled.isFilled).toBe(true)
 
       const after = before.offset(filled)
@@ -167,6 +167,3 @@ describe('OrderBook', () => {
   })
 
 })
-
-
-const decrement = (order, quantity) => new Order(order.map.merge({remaining: order.remaining - quantity}))

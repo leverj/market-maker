@@ -8,7 +8,7 @@ describe('Spread Strategy', () => {
   const currencies = CurrencyPair.of('LEV', 'ETH')
   
   it('construct from config', () => {
-    const fixed = SpreadStrategy.fromConfig({ type: 'fixed', depth: 3, quantity: 1, step: 0.1 })
+    const fixed = SpreadStrategy.fromConfig({ type: 'fixed', precision: 2, depth: 3, quantity: 1, step: 0.1 })
     expect(fixed.depth).toBe(3)
     expect(fixed.quantity).toBe(1)
     expect(fixed.step).toBe(0.1)
@@ -24,8 +24,8 @@ describe('Spread Strategy', () => {
 
   describe('fixed spread', () => {
     it('generating orders', () => {
-      const depth = 3, quantity = 20, step = 5
-      const spread = SpreadStrategy.fixed(depth, quantity, step)
+      const precision = 2, depth = 3, quantity = 20, step = 5
+      const spread = SpreadStrategy.fixed(precision, depth, quantity, step)
       const price = 100.00
       const orders = spread.applyTo(price, currencies).sortBy(each => each.price)
       expect(orders.map(each => each.price)).toEqual(List.of(85, 90, 95, 105, 110, 115))
@@ -33,8 +33,8 @@ describe('Spread Strategy', () => {
     })
 
     it('generate symmetric bid & ask orders', () => {
-      const depth = 3, quantity = 1, step = 0.1
-      const spread = SpreadStrategy.fixed(depth, quantity, step)
+      const precision = 2, depth = 3, quantity = 1, step = 0.1
+      const spread = SpreadStrategy.fixed(precision, depth, quantity, step)
       const price = 10.50
       const orders = spread.applyTo(price, currencies)
       const bids = orders.filter(each => each.isBid)
@@ -49,18 +49,18 @@ describe('Spread Strategy', () => {
     })
 
     it('a fixed spread has valid depth, quantity, and step', () => {
-      const depth = 3, quantity = 1, step = 0.1
-      expect(() => SpreadStrategy.fixed(0, quantity, step)).toThrow(/depth must be 1 or greater/)
-      expect(() => SpreadStrategy.fixed(depth, 0, step)).toThrow(/quantity must be 1 or greater/)
-      expect(() => SpreadStrategy.fixed(depth, quantity, 0)).toThrow(/step must be a positive price increment/)
-      expect(() => SpreadStrategy.fixed(depth, quantity, -0.1)).toThrow(/step must be a positive price increment/)
+      const precision = 2, depth = 3, quantity = 1, step = 0.1
+      expect(() => SpreadStrategy.fixed(precision, 0, quantity, step)).toThrow(/depth must be 1 or greater/)
+      expect(() => SpreadStrategy.fixed(precision, depth, 0, step)).toThrow(/quantity must be 1 or greater/)
+      expect(() => SpreadStrategy.fixed(precision, depth, quantity, 0)).toThrow(/step must be a positive price increment/)
+      expect(() => SpreadStrategy.fixed(precision, depth, quantity, -0.1)).toThrow(/step must be a positive price increment/)
     })
   })
 
   describe('linear spread', () => {
     it('generating orders', () => {
-      const depth = 3, quantity = 20, step = 5, factor = 0.2
-      const spread = SpreadStrategy.linear(depth, quantity, step, factor)
+      const precision = 2, depth = 3, quantity = 20, step = 5, factor = 0.2
+      const spread = SpreadStrategy.linear(precision, depth, quantity, step, factor)
       const price = 100.00
       const orders = spread.applyTo(price, currencies).sortBy(each => each.price)
       expect(orders.map(each => each.price)).toEqual(List.of(85, 90, 95, 105, 110, 115))
@@ -70,8 +70,8 @@ describe('Spread Strategy', () => {
 
   describe('ratio spread', () => {
     it('generating orders', () => {
-      const depth = 3, quantity = 20, ratio = 0.10
-      const spread = SpreadStrategy.ratio(depth, quantity, ratio)
+      const precision = 2, depth = 3, quantity = 20, ratio = 0.10
+      const spread = SpreadStrategy.ratio(precision, depth, quantity, ratio)
       const price = 100.00
       const orders = spread.applyTo(price, currencies).sortBy(each => each.price)
       expect(orders.map(each => each.price)).toEqual(List.of(70, 80, 90, 110, 120, 130))
@@ -81,8 +81,8 @@ describe('Spread Strategy', () => {
 
   describe('logarithmic spread', () => {
     it('generating orders', () => {
-      const depth = 3, quantity = 20, factor = 10
-      const spread = SpreadStrategy.logarithmic(depth, quantity, factor)
+      const precision = 2, depth = 3, quantity = 20, factor = 10
+      const spread = SpreadStrategy.logarithmic(precision, depth, quantity, factor)
       const price = 100.05
       const orders = spread.applyTo(price, currencies).sortBy(each => each.price)
       expect(orders.map(each => each.price)).toEqual(List.of(96.57, 96.75, 97.05, 103.05, 103.35, 103.53))

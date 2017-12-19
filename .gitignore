@@ -1,5 +1,10 @@
+.idea/
+.DS_Store
+
 node_modules/
 
+_docs_/
+config/secrets/
 lib/
 dist/
 build/
@@ -7,7 +12,4 @@ coverage/
 data/
 logs/
 *.log
-config/secrets/
 
-.idea/
-.DS_Store

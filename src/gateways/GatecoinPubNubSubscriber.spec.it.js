@@ -10,8 +10,8 @@ import Exchange from "../domain/Exchange"
 
 
 const callback = (trade) => {
-  print("CALLBACK called")
-  printJson(trade)
+  // print("CALLBACK called")
+  // printJson(trade)
   callbackResults.set(trade.id, trade)
 }
 const callbackResults = Map().asMutable()

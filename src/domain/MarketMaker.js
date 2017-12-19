@@ -18,20 +18,16 @@ export default class MarketMaker {
   static fromConfig(exchange, config) {
     const currencies = CurrencyPair.fromConfig(config.currencies)
     const strategy = SpreadStrategy.fromConfig(config.spread)
-    const trades = JobQueue.fromConfig(config.trades)
+    const jobs = JobQueue.fromConfig(config.jobs)
     const saveChanges = config.save_changes
-    return this.of(exchange, strategy, currencies, trades, saveChanges)
+    return new MarketMaker(exchange, strategy, currencies, jobs, saveChanges)
   }
 
-  static of(exchange, strategy, currencies, trades, saveChanges = false) {
-    return new MarketMaker(exchange, strategy, currencies, trades, saveChanges)
-  }
-
-  constructor(exchange, strategy, currencies, trades, saveChanges) {
+  constructor(exchange, strategy, currencies, jobs, saveChanges) {
     this.exchange = exchange
     this.strategy = strategy
     this.currencies = currencies
-    this.trades = trades
+    this.jobs = jobs
     this.saveChanges = saveChanges
     /** starting with an empty book, we need to synchronize with the exchange */
     this.book = OrderBook.of(currencies)
@@ -41,10 +37,9 @@ export default class MarketMaker {
    * this is needed whenever a MarketMaker comes alive.
    */
   async synchronize() {
-    //fixme: how do we distinguish between 'our' orders and others? (validate that we only get ours from the exchange)
-
-    this.trades.stop() // stop processing trades while we update the book
-    this.exchange.subscribe(this.currencies, this.respondTo) //fixme: need to unsubscribe first?
+    this.jobs.stop() // stop processing jobs while we update the book
+    // this.exchange.subscribe(this.currencies, this.respondToTrade)
+    this.exchange.subscribe(this.currencies, this.respondToPriceChange)
 
     /* establish a book from the exchange */
     const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
@@ -52,7 +47,7 @@ export default class MarketMaker {
 
     /* now get the latest exchange rate and re-spread accordingly */
     const result = this._respread_(this._store_(bookFromExchange))
-    this.trades.start() // now resume processing trades
+    this.jobs.start() // now resume processing jobs
     return result
   }
 
@@ -60,7 +55,7 @@ export default class MarketMaker {
    * 1. merge the book with the newly traded order
    * 2. if the orders are filled, re-spread the book by applying the spread strategy to it
    */
-  async respondTo_new(trade) {
+  async respondToTrade_new(trade) {
     const job = () => new Promise(resolve => {
       const orders = this.book.ordersApplicableTo(trade)
       if (orders.isEmpty()) Promise.resolve(this.book)
@@ -73,14 +68,10 @@ export default class MarketMaker {
       }
       resolve()
     })
-    this.trades.push(job)
+    this.jobs.push(job)
   }
 
-  async respondTo(order) {
-    return this.respondTo_older(order)
-  }
-
-  async respondTo_older(order) {
+  async respondToTrade(order) {
     const job = () => new Promise(resolve => {
       if (this.book.hasOrder(order.id)) {
         const currentOrder = this.book.getOrder(order.id)
@@ -92,7 +83,21 @@ export default class MarketMaker {
       } else Promise.resolve(this.book)
       resolve()
     })
-    this.trades.push(job)
+    this.jobs.push(job)
+  }
+
+  /** on notification of a price change:
+   * 1. refresh book from exchange
+   * 2. re-spread the book by applying the spread strategy to it
+   */
+  async respondToPriceChange(price) {
+    const job = () => {
+      this.exchange.getCurrentOrdersFor(this.currencies).
+        then(orders => orders.filterNot(each => each.isFilled)).
+        then(orders => OrderBook.of(this.currencies, orders)).
+        then(book => this._respread_(book))
+    }
+    this.jobs.push(job)
   }
 
   /**
@@ -117,7 +122,7 @@ export default class MarketMaker {
       //fixme: what should we do instead?
       log.warn('failed to cancel at least one of %s', toCancel.join('\n'))
     }
-    return this._store_(OrderBook.of(this.currencies, toKeep.merge(placed)))
+    return this._store_(OrderBook.of(this.currencies, toKeep.concat(placed)))
   }
 
   _store_(book) {

@@ -9,16 +9,12 @@
     "start:prod": "cross-env NODE_ENV=production node lib/index",
     "start:pm:test": "cross-env NODE_ENV=test pm2 start lib/index && pm2 logs",
     "start:pm:prod": "cross-env NODE_ENV=production pm2 start lib/index && pm2 logs",
-
     "test": "jest",
     "test:watch": "jest --watch",
-
     "build": "rimraf lib && babel src --out-dir lib --ignore .spec. --source-maps",
     "build:watch": "babel src --out-dir lib --ignore .spec. --source-maps --watch",
-
     "dist": "rimraf dist && npm run build && npm run dist:copy",
     "dist:copy": "mkdir dist && cp -r lib config package.json package-lock.json dist/",
-
     "version:patch": "npm version patch"
   },
   "repository": {
@@ -37,8 +33,12 @@
   },
   "homepage": "https://github.com/leverj/market-maker/#readme",
   "babel": {
-    "presets": [ "node8" ],
-    "plugins": [ "source-map-support" ]
+    "presets": [
+      "node8"
+    ],
+    "plugins": [
+      "source-map-support"
+    ]
   },
   "jest": {
     "testMatch": [
