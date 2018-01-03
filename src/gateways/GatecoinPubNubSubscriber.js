@@ -76,7 +76,7 @@ export const tradeFrom = (tradeMessage, currencies) => {
     const trade = tradeMessage.message.trade
     const {askOrderId, bidOrderId, direction, price, amount, tid, date} = trade
     const timestamp = new Date(date * 1000)
-    const theDirection = (direction.toLowerCase() == 'bid') ? Side.bid : Side.ask
+    const theDirection = (direction.toLowerCase() === 'bid') ? Side.bid : Side.ask
     return Trade.of(askOrderId, bidOrderId, theDirection, amount, price, currencies, tid, timestamp)
   } catch (e) {
     log.warn('bad trade: %s', tradeMessage, e)
@@ -90,12 +90,12 @@ export const orderFrom = (orderMessage) => {
     const trade = orderMessage.message
     const {oid, code, side, price, initAmount, remainAmout, status} = trade.order
     if (!CurrencyPair.has(code)) return null // ignore
-    if (remainAmout == initAmount) return null // ignore
-    if (status == 1) return null // ignore: 1 = New, 2 = Filling
+    if (remainAmout === initAmount) return null // ignore
+    if (status === 1) return null // ignore: 1 = New, 2 = Filling
 
     const timestamp = new Date(trade.stamp * 1000)
     const currencies = CurrencyPair.get(code)
-    const theSide = (side == 0) ? Side.bid : Side.ask // Bid = 0 and Ask = 1
+    const theSide = (side === 0) ? Side.bid : Side.ask // Bid = 0 and Ask = 1
     return Order.of(theSide, initAmount, price, currencies).withRemaining(remainAmout).placeWith(oid, timestamp)
   } catch (e) {
     log.warn('bad trade: %s', orderMessage, e)

@@ -22,7 +22,7 @@ export default class GatecoinTickerSubscriber {
     const getLastPrice = async () => await rest(url).get().
       then(response => validate(response) && response.ticker.last).
       then(price => {
-        if (price != this.price) {
+        if (price !== this.price) {
           this.price = price
           callback(price)
         }
@@ -43,7 +43,7 @@ export default class GatecoinTickerSubscriber {
 const log = getLogger('Gatecoin')
 
 const validate = (response) => isOK(response) ? true : throwError(response)
-const isOK = (response) => response.responseStatus.message == 'OK'
+const isOK = (response) => response.responseStatus.message === 'OK'
 const throwError = (response) => {
   const {errorCode, message} = response.responseStatus
   throw new Error(`[${errorCode}] ${message}`)

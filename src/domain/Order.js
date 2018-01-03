@@ -41,19 +41,19 @@ export default class Order extends ImmutableObject {
   }
   toLongString() { return `${this.toString()} [${this.id} : ${this.timestamp}]` }
 
-  get isBid() { return this.side == Side.bid}
-  get isAsk() { return this.side == Side.ask }
+  get isBid() { return this.side === Side.bid}
+  get isAsk() { return this.side === Side.ask }
   get isPlaced() { return !!(this.id) }
-  get isNew() { return this.quantity == this.remaining }
-  get isFilled() { return this.remaining == 0 }
+  get isNew() { return this.quantity === this.remaining }
+  get isFilled() { return this.remaining === 0 }
   get isFilling() { return 0 < this.remaining && this.remaining < this.quantity }
 
-  isRelatedTo(that) { return this.isLike(that) && this.id == that.id }
+  isRelatedTo(that) { return this.isLike(that) && this.id === that.id }
   isLike(that) {
     return (
-      this.side == that.side &&
-      this.price == that.price &&
-      this.quantity == that.quantity &&
+      this.side === that.side &&
+      this.price === that.price &&
+      this.quantity === that.quantity &&
       this.currencies.equals(that.currencies)
     )
   }
@@ -80,5 +80,5 @@ class ComparableOrder extends Order {
   /** overriding (ValueObject) equality to compare using similarity */
   hashCode() { return this.side.length * this.price * this.quantity * this.remaining * this.currencies.hashCode() }
   equals(that) { return this.isSimilarTo(that) }
-  isSimilarTo(that) { return this.isLike(that) && this.remaining == that.remaining }
+  isSimilarTo(that) { return this.isLike(that) && this.remaining === that.remaining }
 }

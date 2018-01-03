@@ -32,7 +32,7 @@ export default class Gatecoin extends ExchangeGateway {
   }
 
   withOptions(method, url) {
-    const contentType = method == 'GET' ? '' : 'application/json'
+    const contentType = method === 'GET' ? '' : 'application/json'
     const now = Date.now() / 1000
     const message = `${method}${url}${contentType}${now}`.toLowerCase()
     const signature = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(message, this.privateKey))
@@ -70,7 +70,7 @@ export default class Gatecoin extends ExchangeGateway {
     const url = `${this.apiUrl}${endpoint}`
     return this.call(rest(url, this.withOptions('GET', url)).get(), url).
       then((response) => validate(response) && List(response.orders).
-        filter(each => each.code == currencies.code).
+        filter(each => each.code === currencies.code).
         map(each => toOrder(each))).
       catch(this.exceptionHandler)
   }
@@ -136,7 +136,7 @@ const toOrder = (item) => {
     id: item.clOrderId,
     timestamp: fromSecondsStringToDate(item.date),
     currencies: CurrencyPair.get(item.code).code,
-    side: (item.side == 1 ? Side.ask : Side.bid),  // Bid = 0 and Ask = 1
+    side: (item.side === 1 ? Side.ask : Side.bid),  // Bid = 0 and Ask = 1
     price: item.price,
     quantity: item.initialQuantity,
     remaining: item.remainingQuantity,
@@ -144,7 +144,7 @@ const toOrder = (item) => {
 }
 
 const validate = (response) => isOK(response) ? true : throwError(response)
-const isOK = (response) => response.responseStatus.message == 'OK'
+const isOK = (response) => response.responseStatus.message === 'OK'
 const throwError = (response) => {
   const {errorCode, message} = response.responseStatus
   throw new Error(`[${errorCode}] ${message}`)
