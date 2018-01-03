@@ -4,6 +4,7 @@ import fetchival from 'fetchival'
 import fetch from 'node-fetch'
 import {getLogger} from '../common/logging'
 import {withTimeout} from '../common/promises'
+import {printJson} from '../common/globals'
 import Order, {Side} from '../domain/Order'
 import CurrencyPair from '../domain/CurrencyPair'
 import ExchangeGateway from './ExchangeGateway'
@@ -134,7 +135,7 @@ const toOrder = (item) => {
   return new Order(Map({
     id: item.clOrderId,
     timestamp: fromSecondsStringToDate(item.date),
-    currencies: CurrencyPair.get(item.code),
+    currencies: CurrencyPair.get(item.code).code,
     side: (item.side == 1 ? Side.ask : Side.bid),  // Bid = 0 and Ask = 1
     price: item.price,
     quantity: item.initialQuantity,

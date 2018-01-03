@@ -39,14 +39,14 @@ export default class MarketMaker {
   async synchronize() {
     this.jobs.stop() // stop processing jobs while we update the book
     // this.exchange.subscribe(this.currencies, this.respondToTrade)
-    this.exchange.subscribe(this.currencies, this.respondToPriceChange)
+    this.exchange.subscribe(this.currencies, this.respondToPriceChange.bind(this))
 
     /* establish a book from the exchange */
     const ordersFromExchange = await this.exchange.getCurrentOrdersFor(this.currencies)
     const bookFromExchange = OrderBook.of(this.currencies, ordersFromExchange)
 
     /* now get the latest exchange rate and re-spread accordingly */
-    const result = this._respread_(this._store_(bookFromExchange))
+    const result = await this._respread_(this._store_(bookFromExchange))
     this.jobs.start() // now resume processing jobs
     return result
   }
