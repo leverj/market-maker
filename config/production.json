@@ -1,0 +1,8 @@
+{
+  "gateways": {
+    "Gatecoin": {
+      "publicKey": "missing",
+      "subscribeKey": "sub-c-ee68e350-4ef7-11e6-bfbb-02ee2ddab7fe"
+    }
+  }
+}
